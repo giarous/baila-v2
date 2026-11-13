@@ -1,44 +1,28 @@
 import React from 'react';
-//import 'react-native-gesture-handler';
-import {
-  createStackNavigator,
-} from 'react-navigation-stack';
-import {createSwitchNavigator, createAppContainer} from 'react-navigation'
-import Home from './Home';
-import CardSelection from './CardSelection';
-import DeckComponent from './Deck';
-import StartScreen from './StartScreen';
-import DescriptionComponent from './DescriptionPage';
+import {createAppContainer} from 'react-navigation';
+import {createStackNavigator} from 'react-navigation-stack';
+import {GameProvider} from './src/state/GameContext';
+import HomeScreen from './src/screens/HomeScreen';
+import SelectionScreen from './src/screens/SelectionScreen';
+import InstructionsScreen from './src/screens/InstructionsScreen';
+import GameScreen from './src/screens/GameScreen';
 
-'use strict';
-type Props = {}; 
+const Navigator = createAppContainer(
+  createStackNavigator(
+    {
+      Home: HomeScreen,
+      Settings: SelectionScreen,
+      Descriptions: InstructionsScreen,
+      NewGame: GameScreen,
+    },
+    {initialRouteName: 'Home', headerMode: 'none'},
+  ),
+);
 
-const App = createAppContainer(createStackNavigator({
-
-  Start: { 
-    screen: StartScreen, 
-    navigationOptions: { title: "Cure for insomnia :D" }
-  },
-  Home: { 
-    screen: Home, 
-    navigationOptions: { title: "Cure for insomnia :D" }
-  },
-  Settings: {
-    screen: CardSelection,
-    navigationOptions: {title: "Choose cards" }
-  },
-  Descriptions: {
-    screen: DescriptionComponent,
-    navigationOptions: {title: "Choose cards" }
-  },
-  NewGame: { 
-    screen: DeckComponent, 
-    navigationOptions: { title: "New Game" }
-  },
-  },
-  {
-    initialRouteName: 'Start',
-    mode: 'modal',
-    headerMode: 'none'
-  }));
-export default App;
+export default function App() {
+  return (
+    <GameProvider>
+      <Navigator />
+    </GameProvider>
+  );
+}

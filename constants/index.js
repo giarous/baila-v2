@@ -1,7 +1,4 @@
-import colors from './colors'
-import photoCards from './photoCards'
+import colors from './colors';
+import photoCards from './photoCards';
 
-export {
-  colors,
-  photoCards
-}
+export {colors, photoCards};
