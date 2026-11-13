@@ -1,4 +1,4 @@
-# Baila
+# Baila v2
 
 A mobile card game for three or more people, inspired by the Estonian game. Pick your card types, start a shuffled deck, and take turns swiping. Rules are available in English and Russian.
 
@@ -6,7 +6,9 @@ The interface uses a warm cream palette, coral actions, teal accents, and the or
 
 ## Try the Android test build
 
-[Download the standalone APK](artifacts/android/baila-preview.apk?raw=true). On GitHub, you can also open that file and choose **Download raw file**. This development-signed build runs without Metro. See [build notes and known limitations](artifacts/android/README.md).
+The installed app is named **Baila v2** and uses application ID `com.tbaila.v2`, so it can coexist with the original `com.tbaila` app. iOS uses the separate bundle ID `com.tbaila.v2` and the same display name. Both platforms include the new card-stack launcher icon.
+
+[Download the standalone APK](artifacts/android/baila-v2-preview.apk?raw=true). On GitHub, you can also open that file and choose **Download raw file**. This development-signed build runs without Metro. See [build notes and known limitations](artifacts/android/README.md).
 
 ## Development
 
@@ -25,7 +27,7 @@ npm run android
 npm run ios
 ```
 
-Android uses Gradle 5.6.4, Android Gradle plugin 3.6.2, SDK platform 28, and build-tools 28.0.3. Use a compatible legacy JDK rather than the cloud image's JDK 21. The prepared cloud environment now includes this Android toolchain. Debug and standalone release APK builds have passed; device interaction still needs a smoke check.
+Android uses Gradle 5.6.4, Android Gradle plugin 3.6.2, SDK platform 28, and build-tools 28.0.3. Use a compatible legacy JDK rather than the cloud image's JDK 21. The prepared cloud environment now includes this Android toolchain. The standalone release APK build has passed; physical-device review is still pending.
 
 ## Prepared cloud Android environment
 
@@ -37,7 +39,7 @@ cd /workspace/baila/android
 gradle --no-daemon --max-workers=2 -Dorg.gradle.jvmargs=-Xmx2g assembleRelease
 ```
 
-This uses the verified Gradle installation directly. The resulting universal APK is at `android/app/build/outputs/apk/release/app-universal-release.apk`. It embeds JavaScript and assets and can run without Metro. The existing release configuration signs it with a development key; it is a test build, not a store release. A copy is available at `/workspace/baila-preview/baila-preview.apk`.
+This uses the verified Gradle installation directly. The resulting universal APK is at `android/app/build/outputs/apk/release/app-universal-release.apk`. It embeds JavaScript and assets and can run without Metro. The existing release configuration signs it with a development key; it is a test build, not a store release. A copy is available at `/workspace/baila-preview/baila-v2-preview.apk`.
 
 The cloud machine has no KVM acceleration. A small Android 9 emulator is configured for software emulation:
 
@@ -52,8 +54,8 @@ In another terminal, wait for `adb shell getprop sys.boot_completed` to return `
 
 ```sh
 source /workspace/.android-dev/activate.sh
-adb install -r /workspace/baila/android/app/build/outputs/apk/release/app-x86_64-release.apk
-adb shell am start -n com.tbaila/.MainActivity
+adb install --no-streaming -r /workspace/baila/android/app/build/outputs/apk/release/app-x86_64-release.apk
+adb shell am start -n com.tbaila.v2/com.tbaila.MainActivity
 adb exec-out screencap -p > /workspace/baila-preview/home.png
 ```
 

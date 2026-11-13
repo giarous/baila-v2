@@ -128,7 +128,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.tbaila"
+        applicationId "com.tbaila.v2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
