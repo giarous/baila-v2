@@ -1,18 +1,13 @@
 import {photoCards} from '../constants';
-import {
-  createDeck,
-  shuffle,
-  localizeCard,
-  introduction,
-} from '../src/game/deck';
+import {createDeck, shuffle, localizeCard} from '../src/game/deck';
 
-it('keeps four copies of each enabled card and puts the guide first', () => {
+it('starts directly with four copies of each enabled card', () => {
   const cards = photoCards.map((card, index) => ({...card, state: index < 2}));
   const original = JSON.stringify(cards);
   const deck = createDeck(cards, () => 0.5);
 
-  expect(deck).toHaveLength(9);
-  expect(deck[0]).toEqual(introduction);
+  expect(deck).toHaveLength(8);
+  expect(deck.some(card => card.isIntroduction)).toBe(false);
   cards.slice(0, 2).forEach(card => {
     expect(deck.filter(item => item.name === card.name)).toHaveLength(4);
   });
@@ -25,7 +20,7 @@ it('keeps four copies of each enabled card and puts the guide first', () => {
 
 it('supports the complete original catalogue and excludes disabled cards', () => {
   expect(photoCards).toHaveLength(28);
-  expect(createDeck(photoCards)).toHaveLength(113);
+  expect(createDeck(photoCards)).toHaveLength(112);
   expect(createDeck(photoCards.map(card => ({...card, state: false})))).toEqual(
     [],
   );

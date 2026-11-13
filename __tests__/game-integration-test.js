@@ -3,7 +3,6 @@ import renderer, {act} from 'react-test-renderer';
 import {Text} from 'react-native';
 import {GameProvider, useGame} from '../src/state/GameContext';
 import GameScreen from '../src/screens/GameScreen';
-import {Button} from '../src/components/UI';
 
 it('draws the entire deck through the real swiper and its Next card control', () => {
   jest.useFakeTimers();
@@ -38,10 +37,10 @@ it('draws the entire deck through the real swiper and its Next card control', ()
     act(() => {
       stage.props.onLayout({nativeEvent: {layout: {width: 320, height: 420}}});
     });
-    // One guide and four playable cards. A complete draw must return home once.
-    for (let draw = 0; draw < 5; draw += 1) {
+    // Start immediately with four playable cards and return home after the last.
+    for (let draw = 0; draw < 4; draw += 1) {
       act(() => {
-        app.root.findByType(Button).props.onPress();
+        app.root.findByProps({testID: 'next-card'}).props.onPress();
       });
       act(() => {
         jest.advanceTimersByTime(1500);
@@ -50,7 +49,7 @@ it('draws the entire deck through the real swiper and its Next card control', ()
         expect(
           app.root
             .findAllByType(Text)
-            .some(node => node.props.children === '1 / 4'),
+            .some(node => node.props.children === '2 / 4'),
         ).toBe(true);
       }
     }

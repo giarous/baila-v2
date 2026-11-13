@@ -2,11 +2,11 @@
 
 A mobile card game for three or more people, inspired by the Estonian game. Pick your card types, start a shuffled deck, and take turns swiping. Rules are available in English and Russian.
 
-The interface uses a warm cream palette, coral actions, teal accents, and the original card illustrations. All 28 card types and their bilingual rules are retained.
+The interface uses a warm cream palette, coral actions, pale secondary buttons, and the original card illustrations. All 28 card types and their bilingual rules are retained.
 
 ## Try the Android test build
 
-The installed app is named **Baila v2** and uses application ID `com.tbaila.v2`, so it can coexist with the original `com.tbaila` app. iOS uses the separate bundle ID `com.tbaila.v2` and the same display name. Both platforms include the new card-stack launcher icon.
+The installed app is named **Baila v2** and uses application ID `com.tbaila.v2`, so it can coexist with the original `com.tbaila` app. iOS uses the separate bundle ID `com.tbaila.v2` and the same display name. Both platforms use the supplied Baila artwork for their launcher icons, including square and round Android variants.
 
 [Download the standalone APK](artifacts/android/baila-v2-preview.apk?raw=true). On GitHub, you can also open that file and choose **Download raw file**. This development-signed build runs without Metro. See [build notes and known limitations](artifacts/android/README.md).
 
@@ -90,13 +90,13 @@ Jest transforms the legacy navigation packages and loads the gesture handler's n
 | `constants/photoCards.js` | Original illustrations and bilingual card rules |
 | `__tests__/` | Game logic, screen interactions, and swiper integration |
 
-Selection and language remain available while navigating during a session. They are not saved across app restarts, matching the original behavior. Every new game creates four copies of each enabled card type, shuffles them, and places the introductory guide first. The last swipe returns home. An empty selection disables starting a game. Game logic never mutates the source catalogue or an earlier deck.
+Selection and language remain available while navigating during a session. They are not saved across app restarts, matching the original behavior. Every new game creates four copies of each enabled card type, shuffles them, and opens directly on the first playable card. General instructions remain available under How to play. The last swipe returns home. An empty selection disables starting a game. Game logic never mutates the source catalogue or an earlier deck.
 
-Long rules scroll within a card; horizontal swipes advance the deck. The Next card button provides an alternative to swiping. Instructions can be searched using either English or Russian names. Selection controls expose checkbox state to accessibility services.
+Home and gameplay use fixed layouts without scrolling. Gameplay cards show artwork only; the Details button opens the current rules in a native dialog using the selected language. Horizontal swipes or the Next card button advance the deck. Instructions can be searched using either English or Russian names. Selection controls expose checkbox state to accessibility services.
 
 ## Device review
 
-Before shipping, check a small and large phone on Android and iOS: scroll the home page and long rules, select and deselect cards, switch rule languages, swipe and use Next card, cancel and confirm leaving a game, and finish a deck. Verify safe areas, larger text sizes, and screen-reader labels on the device.
+Before shipping, check a small and large phone on Android and iOS: check that all three home buttons fit without scrolling, open card details, select and deselect cards, switch rule languages, swipe and use Next card, cancel and confirm leaving a game, and finish a deck. Verify safe areas, larger text sizes, and screen-reader labels on the device.
 
 ## License
 

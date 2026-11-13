@@ -1,12 +1,12 @@
 import React from 'react';
-import {Text, TextInput} from 'react-native';
+import {Text, TextInput, ScrollView, Alert} from 'react-native';
 import renderer, {act} from 'react-test-renderer';
 import {GameProvider, useGame} from '../src/state/GameContext';
 import HomeScreen from '../src/screens/HomeScreen';
 import SelectionScreen from '../src/screens/SelectionScreen';
 import InstructionsScreen from '../src/screens/InstructionsScreen';
 import GameScreen from '../src/screens/GameScreen';
-import {Button} from '../src/components/UI';
+import PlayingCard from '../src/components/PlayingCard';
 import Swiper from 'react-native-deck-swiper';
 
 // Gesture animations require a device; keep screen tests focused on the callbacks.
@@ -46,6 +46,7 @@ function textIncludes(value) {
     );
 }
 afterEach(() => {
+  jest.restoreAllMocks();
   if (app) {
     act(() => app.unmount());
   }
@@ -65,20 +66,22 @@ it('updates selection immutably and retains it when starting a new game', () => 
   act(() => {
     game.startGame();
   });
-  expect(game.deck).toHaveLength(109);
+  expect(game.deck).toHaveLength(108);
   expect(game.deck.some(card => card.name === 'Barman')).toBe(false);
 });
 
 it('prevents an empty game and permits starting again after selection', () => {
   mount(HomeScreen);
   act(() => game.selectAll(false));
-  expect(app.root.findByType(Button).props.disabled).toBe(true);
-  act(() => app.root.findByType(Button).props.onPress());
+  expect(app.root.findByProps({testID: 'start-game'}).props.disabled).toBe(
+    true,
+  );
+  act(() => app.root.findByProps({testID: 'start-game'}).props.onPress());
   expect(navigation.navigate).not.toHaveBeenCalled();
   act(() => game.toggleCard('Barman'));
-  act(() => app.root.findByType(Button).props.onPress());
+  act(() => app.root.findByProps({testID: 'start-game'}).props.onPress());
   expect(navigation.navigate).toHaveBeenCalledWith('NewGame');
-  expect(game.deck).toHaveLength(5);
+  expect(game.deck).toHaveLength(4);
 });
 
 it('searches bilingual names, expands rules, and switches their language', () => {
@@ -135,10 +138,82 @@ it('advances the card counter and returns home when the deck is exhausted', () =
     stage.props.onLayout({nativeEvent: {layout: {width: 320, height: 450}}}),
   );
   let swiper = app.root.findByType(Swiper);
-  expect(swiper.props.cards).toHaveLength(113);
+  expect(swiper.props.cards).toHaveLength(112);
   act(() => swiper.props.onSwiped(0));
-  expect(textIncludes('1 / 112')).toBe(true);
+  expect(textIncludes('2 / 112')).toBe(true);
   swiper = app.root.findByType(Swiper);
   act(() => swiper.props.onSwipedAll());
   expect(navigation.popToTop).toHaveBeenCalled();
+});
+
+it('keeps home fixed with three equally structured actions and no marketing copy', () => {
+  mount(HomeScreen);
+  expect(app.root.findAllByType(ScrollView)).toHaveLength(0);
+  for (const [id, route] of [
+    ['choose-cards', 'Settings'],
+    ['how-to-play', 'Descriptions'],
+  ]) {
+    const action = app.root.findByProps({testID: id});
+    expect(action.props.secondary).toBe(true);
+    act(() => action.props.onPress());
+    expect(navigation.navigate).toHaveBeenCalledWith(route);
+  }
+  expect(textIncludes('Less scrolling.')).toBe(false);
+});
+
+it('shows rules only when Details is pressed, in the selected language', () => {
+  const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+  mount(GameScreen);
+  act(() => {
+    game.startGame();
+  });
+  expect(alert).not.toHaveBeenCalled();
+  expect(app.root.findAllByType(ScrollView)).toHaveLength(0);
+  const details = () =>
+    app.root.findByProps({testID: 'card-details'}).props.onPress();
+  act(() => details());
+  expect(alert).toHaveBeenLastCalledWith(
+    game.deck[0].name,
+    game.deck[0].description,
+    expect.any(Array),
+  );
+  act(() => {
+    game.setLanguage('ru');
+  });
+  act(() => details());
+  expect(alert).toHaveBeenLastCalledWith(
+    game.deck[0].name_ru,
+    game.deck[0].description_ru,
+    [{text: 'Закрыть'}],
+  );
+  const stage = app.root.findAll(
+    node => typeof node.props.onLayout === 'function',
+  )[0];
+  act(() =>
+    stage.props.onLayout({nativeEvent: {layout: {width: 320, height: 450}}}),
+  );
+  act(() => app.root.findByType(Swiper).props.onSwiped(0));
+  act(() => details());
+  expect(alert).toHaveBeenLastCalledWith(
+    game.deck[1].name_ru,
+    game.deck[1].description_ru,
+    expect.any(Array),
+  );
+});
+
+it('renders gameplay cards as artwork without inline text or scrolling', () => {
+  mount(() => (
+    <PlayingCard
+      card={{
+        name: 'Test card',
+        name_ru: 'Карта',
+        photo: 1,
+        description: 'Hidden rules',
+        description_ru: 'Правила',
+      }}
+    />
+  ));
+  expect(app.root.findAllByType(Text)).toHaveLength(0);
+  expect(app.root.findAllByType(ScrollView)).toHaveLength(0);
+  expect(textIncludes('Hidden rules')).toBe(false);
 });

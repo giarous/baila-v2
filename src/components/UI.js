@@ -129,8 +129,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {color: colors.paper, fontWeight: '700', fontSize: 16},
-  secondary: {backgroundColor: colors.tealLight},
-  secondaryText: {color: colors.teal},
+  secondary: {backgroundColor: colors.coralLight},
+  secondaryText: {color: colors.coral},
   disabled: {opacity: 0.45},
   languages: {
     flexDirection: 'row',

@@ -21,7 +21,7 @@ export function shuffle(cards, random = Math.random) {
   return result;
 }
 
-/** Keep the original rules: four copies per enabled type, preceded by a guide. */
+/** Start directly with the shuffled cards: four copies per enabled type. */
 export function createDeck(cards, random = Math.random) {
   const enabled = cards.filter(card => card.state);
   if (!enabled.length) {
@@ -33,7 +33,7 @@ export function createDeck(cards, random = Math.random) {
       copies.push({...card});
     }
   });
-  return [{...introduction}, ...shuffle(copies, random)];
+  return shuffle(copies, random);
 }
 
 export function localizeCard(card, language) {

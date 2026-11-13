@@ -37,17 +37,12 @@ export default function InstructionsScreen({navigation}) {
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View>
-            <Text style={typography.eyebrow}>
-              A LITTLE GUIDE TO A GOOD TIME
-            </Text>
-            <Text style={[typography.title, styles.title]}>
-              Easy to learn.{'\n'}Hard to predict.
-            </Text>
+            <Text style={[typography.title, styles.title]}>How to play</Text>
             <View style={styles.guide}>
               <Text style={styles.guideTitle}>{guide.title}</Text>
               <Text style={styles.guideText}>{guide.description}</Text>
             </View>
-            <Text style={styles.sectionTitle}>Meet the cards</Text>
+            <Text style={styles.sectionTitle}>Card rules</Text>
             <Text style={typography.body}>Tap a card to read its rules.</Text>
             <TextInput
               accessibilityLabel="Search cards"

@@ -4,61 +4,64 @@ import Swiper from 'react-native-deck-swiper';
 import {Screen, Header, Button} from '../components/UI';
 import PlayingCard from '../components/PlayingCard';
 import {useGame} from '../state/GameContext';
+import {localizeCard} from '../game/deck';
 import {colors} from '../theme';
 
 export default function GameScreen({navigation}) {
-  const {deck} = useGame();
+  const {deck, language} = useGame();
   const swiper = useRef(null);
   const [index, setIndex] = useState(0);
   const [layout, setLayout] = useState(null);
   const [swiping, setSwiping] = useState(false);
   const finish = () => navigation.popToTop();
   const exit = () =>
-    Alert.alert(
-      'Leave this game?',
-      'Your card selection will be kept. A new game starts with a fresh shuffle.',
-      [
-        {text: 'Keep playing', style: 'cancel'},
-        {text: 'Leave game', style: 'destructive', onPress: finish},
-      ],
-    );
+    Alert.alert('Leave this game?', '', [
+      {text: 'Keep playing', style: 'cancel'},
+      {text: 'Leave game', style: 'destructive', onPress: finish},
+    ]);
   const next = () => {
     if (swiper.current && !swiping) {
       setSwiping(true);
       swiper.current.swipeRight();
     }
   };
-  // The first card is the guide and does not count toward the playable deck.
-  const total = Math.max(0, deck.length - 1);
-  const played = Math.max(0, index - 1);
+  const showDetails = () => {
+    const card = deck[index];
+    if (!card) {
+      return;
+    }
+    const {title, description} = localizeCard(card, language);
+    Alert.alert(title, description, [
+      {text: language === 'ru' ? 'Закрыть' : 'Close'},
+    ]);
+  };
+  const measure = event => {
+    const size = event.nativeEvent.layout;
+    if (
+      !layout ||
+      size.width !== layout.width ||
+      size.height !== layout.height
+    ) {
+      setSwiping(false);
+      setLayout(size);
+    }
+  };
 
   return (
     <Screen>
-      <Header navigation={navigation} onBack={exit} />
-      <View style={styles.progressCopy}>
-        <Text style={styles.eyebrow}>
-          {index === 0 ? 'GATHER YOUR PEOPLE' : 'PASS IT AROUND'}
-        </Text>
-        <Text style={styles.count}>
-          {index === 0
-            ? `${total} cards in play`
-            : `${Math.min(index, total)} / ${total}`}
-        </Text>
-      </View>
-      <View style={styles.track}>
-        <View
-          style={[
-            styles.progress,
-            {width: `${total ? (played / total) * 100 : 0}%`},
-          ]}
-        />
-      </View>
-      <View
-        style={styles.stage}
-        onLayout={event => setLayout(event.nativeEvent.layout)}>
+      <Header
+        navigation={navigation}
+        onBack={exit}
+        label={
+          deck.length
+            ? `${Math.min(index + 1, deck.length)} / ${deck.length}`
+            : 'BAILA'
+        }
+      />
+      <View style={styles.stage} onLayout={measure}>
         {layout && deck.length > 0 && (
           <Swiper
-            // Remount for a changed available area: this legacy swiper caches dimensions.
+            // The legacy swiper caches its dimensions, so remount after resizing.
             key={`${layout.width}-${layout.height}`}
             ref={swiper}
             cards={deck}
@@ -66,7 +69,7 @@ export default function GameScreen({navigation}) {
             renderCard={card => (card ? <PlayingCard card={card} /> : null)}
             cardStyle={{
               width: layout.width,
-              height: Math.max(1, layout.height - 24),
+              height: Math.max(1, layout.height - 18),
             }}
             containerStyle={styles.swiper}
             cardVerticalMargin={0}
@@ -74,8 +77,8 @@ export default function GameScreen({navigation}) {
             marginTop={0}
             marginBottom={0}
             backgroundColor="transparent"
-            stackSize={3}
-            stackSeparation={9}
+            stackSize={2}
+            stackSeparation={8}
             animateCardOpacity
             infinite={false}
             verticalSwipe={false}
@@ -90,54 +93,37 @@ export default function GameScreen({navigation}) {
           />
         )}
         {!deck.length && (
-          <Text style={styles.empty}>
-            Choose some cards from the home screen to start a game.
-          </Text>
+          <Text style={styles.empty}>Choose a card type to play.</Text>
         )}
       </View>
-      <View style={styles.bottom}>
-        <Text style={styles.hint}>Swipe left or right for the next card</Text>
-        <Button
-          title={index === 0 ? 'Ready? Let’s go  →' : 'Next card  →'}
-          onPress={next}
-          disabled={swiping || !deck.length}
-          testID="next-card"
-        />
+      <View style={styles.controls}>
+        <View style={styles.details}>
+          <Button
+            title="Details"
+            secondary
+            onPress={showDetails}
+            disabled={swiping || !deck[index]}
+            testID="card-details"
+          />
+        </View>
+        <View style={styles.next}>
+          <Button
+            title="Next card →"
+            onPress={next}
+            disabled={swiping || !layout || !deck[index]}
+            testID="next-card"
+          />
+        </View>
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  progressCopy: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 12,
-  },
-  eyebrow: {
-    fontSize: 10,
-    color: colors.teal,
-    fontWeight: '800',
-    letterSpacing: 1.5,
-  },
-  count: {fontSize: 12, color: colors.muted, fontWeight: '600'},
-  track: {
-    height: 4,
-    backgroundColor: colors.line,
-    borderRadius: 2,
-    marginBottom: 24,
-  },
-  progress: {height: 4, backgroundColor: colors.teal, borderRadius: 2},
-  stage: {flex: 1, minHeight: 220},
+  stage: {flex: 1, minHeight: 0},
   swiper: {flex: 1},
-  bottom: {paddingBottom: 16, paddingTop: 10},
-  hint: {
-    fontSize: 12,
-    color: colors.muted,
-    textAlign: 'center',
-    marginBottom: 14,
-  },
-  empty: {color: colors.muted, paddingVertical: 30, lineHeight: 24},
+  controls: {flexDirection: 'row', paddingTop: 8, paddingBottom: 16},
+  details: {flex: 1, marginRight: 10},
+  next: {flex: 1},
+  empty: {color: colors.muted, textAlign: 'center', paddingTop: 24},
 });

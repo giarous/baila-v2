@@ -12,12 +12,9 @@ export default function SelectionScreen({navigation}) {
   return (
     <Screen>
       <Header navigation={navigation} />
-      <Text style={typography.eyebrow}>YOUR NIGHT, YOUR RULES</Text>
-      <Text style={[typography.title, styles.title]}>Make it your deck.</Text>
-      <Text style={typography.body}>
-        Keep your favorites. Leave the rest. Each selected type adds four cards
-        to the game.
-      </Text>
+
+      <Text style={[typography.title, styles.title]}>Your deck</Text>
+      <Text style={typography.body}>Four copies of each selected type.</Text>
       <View style={styles.toolbar}>
         <Text style={styles.count}>
           {selected} / {cards.length} selected
