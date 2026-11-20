@@ -2,6 +2,8 @@
 
 A mobile card game with the original 28 card types, selectable decks, swipe gameplay, and English/Russian rules. The installed name is **BAILA**. The application ID remains `com.tbaila.v2`, so it installs alongside the original `com.tbaila` app.
 
+Deck selection uses larger full-width illustrations. Each selection tile has an Info button that shows its localized rules without changing selection.
+
 Home and gameplay use fixed layouts. Cards show artwork; **Details** opens the current card's rules. Changing EN/RU updates buttons, instructions, search, selection controls, accessibility labels, card details, and confirmation dialogs across the app.
 
 ## Build and download on GitHub

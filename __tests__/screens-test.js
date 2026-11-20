@@ -221,3 +221,47 @@ it('renders gameplay cards as artwork without inline text or scrolling', async (
   expect(app.root.findAllByType(ScrollView)).toHaveLength(0);
   expect(textIncludes('Hidden rules')).toBe(false);
 });
+
+it('opens selection-card information without changing selection, in either language', async () => {
+  const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+  await mount(SelectionScreen);
+  const original = game.cards;
+  await act(async () =>
+    app.root.findByProps({testID: 'card-info-Barman'}).props.onPress(),
+  );
+  expect(alert).toHaveBeenLastCalledWith(
+    game.cards[0].name,
+    game.cards[0].description,
+    [{text: 'Close'}],
+  );
+  expect(game.cards).toBe(original);
+  await act(async () => {
+    game.toggleCard('Barman');
+    game.setLanguage('ru');
+  });
+  const selectionBeforeInfo = game.cards;
+  const info = app.root.findByProps({testID: 'card-info-Barman'});
+  expect(info.props.accessibilityLabel).toBe('Информация о карте «Бармен»');
+  await act(async () => info.props.onPress());
+  expect(alert).toHaveBeenLastCalledWith(
+    game.cards[0].name_ru,
+    game.cards[0].description_ru,
+    [{text: 'Закрыть'}],
+  );
+  expect(game.cards).toBe(selectionBeforeInfo);
+  expect(game.cards[0].state).toBe(false);
+  // FlatList mounts visible rows only; every mounted card has an info action.
+  const visible = app.root.findAll(
+    (node) => node.props.accessibilityRole === 'checkbox',
+    {deep: false},
+  );
+  expect(visible.length).toBeGreaterThan(0);
+  for (const checkbox of visible) {
+    const card = game.cards.find(
+      (item) => item.name_ru === checkbox.props.accessibilityLabel,
+    );
+    expect(
+      app.root.findByProps({testID: `card-info-${card.name}`}),
+    ).toBeDefined();
+  }
+});

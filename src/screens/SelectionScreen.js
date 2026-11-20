@@ -1,7 +1,14 @@
 import {useStrings} from '../i18n';
 import CardArtwork from '../components/CardArtwork';
 import React from 'react';
-import {FlatList, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import {Screen, Header, Button, typography} from '../components/UI';
 import {useGame} from '../state/GameContext';
 import {localizeCard, COPIES_PER_CARD} from '../game/deck';
@@ -11,6 +18,10 @@ export default function SelectionScreen({navigation}) {
   const strings = useStrings();
   const {cards, language, toggleCard, selectAll} = useGame();
   const selected = cards.filter((card) => card.state).length;
+  const showInformation = (card) => {
+    const {title, description} = localizeCard(card, language);
+    Alert.alert(title, description, [{text: strings.close}]);
+  };
   return (
     <Screen>
       <Header navigation={navigation} />
@@ -40,27 +51,46 @@ export default function SelectionScreen({navigation}) {
         showsVerticalScrollIndicator={false}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
-        renderItem={({item}) => (
-          <TouchableOpacity
-            accessibilityRole="checkbox"
-            accessibilityLabel={localizeCard(item, language).title}
-            accessibilityState={{checked: item.state}}
-            onPress={() => toggleCard(item.name)}
-            activeOpacity={0.75}
-            style={[styles.tile, item.state && styles.selectedTile]}
-          >
-            <View style={styles.tileTop}>
-              <Text style={styles.copies}>×{COPIES_PER_CARD}</Text>
-              <View style={[styles.check, item.state && styles.checked]}>
-                <Text style={styles.checkText}>{item.state ? '✓' : ''}</Text>
-              </View>
+        renderItem={({item}) => {
+          const {title} = localizeCard(item, language);
+          return (
+            <View style={[styles.tile, item.state && styles.selectedTile]}>
+              <TouchableOpacity
+                accessibilityRole="checkbox"
+                accessibilityLabel={title}
+                accessibilityState={{checked: item.state}}
+                onPress={() => toggleCard(item.name)}
+                activeOpacity={0.75}
+                style={styles.selection}
+              >
+                <View style={styles.tileTop}>
+                  <Text style={styles.copies}>×{COPIES_PER_CARD}</Text>
+                  <View style={[styles.check, item.state && styles.checked]}>
+                    <Text style={styles.checkText}>
+                      {item.state ? '✓' : ''}
+                    </Text>
+                  </View>
+                </View>
+                <CardArtwork source={item.photo} style={styles.image} />
+                <Text style={styles.cardName}>{title}</Text>
+              </TouchableOpacity>
+              {/* A sibling button keeps opening rules separate from deck selection. */}
+              <TouchableOpacity
+                testID={`card-info-${item.name}`}
+                accessibilityRole="button"
+                accessibilityLabel={strings.cardInformation(title)}
+                onPress={() => showInformation(item)}
+                activeOpacity={0.75}
+                style={styles.infoButton}
+              >
+                <Text accessible={false} style={styles.infoIcon}>
+                  ⓘ
+                </Text>
+                <Text style={styles.infoText}>{strings.info}</Text>
+              </TouchableOpacity>
             </View>
-            <CardArtwork source={item.photo} style={styles.image} />
-            <Text style={styles.cardName}>
-              {localizeCard(item, language).title}
-            </Text>
-          </TouchableOpacity>
-        )}
+          );
+        }}
       />
       <View style={styles.bottom}>
         {!selected && <Text style={styles.hint}>{strings.emptySelection}</Text>}
@@ -93,10 +123,30 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.line,
     borderRadius: 20,
-    padding: 12,
+    overflow: 'hidden',
     marginBottom: 12,
   },
   selectedTile: {borderColor: colors.teal},
+  selection: {flex: 1, padding: 8, paddingBottom: 4},
+  infoButton: {
+    minHeight: 44,
+    marginHorizontal: 8,
+    marginBottom: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.tealLight,
+  },
+  infoIcon: {fontSize: 18, color: colors.teal, marginRight: 6},
+  infoText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.teal,
+    flexShrink: 1,
+  },
   tileTop: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -115,11 +165,15 @@ const styles = StyleSheet.create({
   checked: {backgroundColor: colors.teal, borderColor: colors.teal},
   checkText: {color: colors.paper, fontWeight: '800', fontSize: 14},
   image: {
-    height: 102,
-    width: 68,
-    marginVertical: 12,
+    width: '100%',
+    marginVertical: 4,
   },
-  cardName: {color: colors.ink, fontWeight: '700', fontSize: 13, minHeight: 34},
+  cardName: {
+    color: colors.ink,
+    fontWeight: '700',
+    fontSize: 13,
+    lineHeight: 18,
+  },
   bottom: {paddingVertical: 12, borderTopWidth: 1, borderColor: colors.line},
   hint: {
     fontSize: 12,
