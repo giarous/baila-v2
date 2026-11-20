@@ -1,3 +1,4 @@
+import {useStrings} from '../i18n';
 import CardArtwork from '../components/CardArtwork';
 import React from 'react';
 import {FlatList, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
@@ -7,31 +8,34 @@ import {localizeCard, COPIES_PER_CARD} from '../game/deck';
 import {colors} from '../theme';
 
 export default function SelectionScreen({navigation}) {
+  const strings = useStrings();
   const {cards, language, toggleCard, selectAll} = useGame();
-  const selected = cards.filter(card => card.state).length;
+  const selected = cards.filter((card) => card.state).length;
   return (
     <Screen>
       <Header navigation={navigation} />
 
-      <Text style={[typography.title, styles.title]}>Your deck</Text>
-      <Text style={typography.body}>Four copies of each selected type.</Text>
+      <Text style={[typography.title, styles.title]}>{strings.yourDeck}</Text>
+      <Text style={typography.body}>{strings.copiesHint}</Text>
       <View style={styles.toolbar}>
         <Text style={styles.count}>
-          {selected} / {cards.length} selected
+          {strings.selectedCount(selected, cards.length)}
         </Text>
         <TouchableOpacity
+          testID="select-all"
           accessibilityRole="button"
           style={styles.selectAll}
-          onPress={() => selectAll(selected !== cards.length)}>
+          onPress={() => selectAll(selected !== cards.length)}
+        >
           <Text style={styles.selectAllText}>
-            {selected === cards.length ? 'Clear all' : 'Select all'}
+            {selected === cards.length ? strings.clearAll : strings.selectAll}
           </Text>
         </TouchableOpacity>
       </View>
       <FlatList
         data={cards}
         extraData={language}
-        keyExtractor={card => card.name}
+        keyExtractor={(card) => card.name}
         numColumns={2}
         showsVerticalScrollIndicator={false}
         columnWrapperStyle={styles.row}
@@ -43,7 +47,8 @@ export default function SelectionScreen({navigation}) {
             accessibilityState={{checked: item.state}}
             onPress={() => toggleCard(item.name)}
             activeOpacity={0.75}
-            style={[styles.tile, item.state && styles.selectedTile]}>
+            style={[styles.tile, item.state && styles.selectedTile]}
+          >
             <View style={styles.tileTop}>
               <Text style={styles.copies}>×{COPIES_PER_CARD}</Text>
               <View style={[styles.check, item.state && styles.checked]}>
@@ -58,13 +63,10 @@ export default function SelectionScreen({navigation}) {
         )}
       />
       <View style={styles.bottom}>
-        {!selected && (
-          <Text style={styles.hint}>
-            Choose at least one type before playing.
-          </Text>
-        )}
+        {!selected && <Text style={styles.hint}>{strings.emptySelection}</Text>}
         <Button
-          title={`Done · ${selected * COPIES_PER_CARD} cards`}
+          testID="selection-done"
+          title={strings.done(selected * COPIES_PER_CARD)}
           onPress={() => navigation.goBack()}
         />
       </View>

@@ -1,0 +1,96 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.1.12297006' 'cmake;3.22.1'
+
+      - name: Install JavaScript dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run tests
+        run: npm test -- --runInBand --watch=false
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Use the public React Native development signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This is the publicly distributed template key, not a private release identity.
+          npm pack --silent --pack-destination "$RUNNER_TEMP" @react-native-community/template@0.86.0
+          tar -xOf "$RUNNER_TEMP/react-native-community-template-0.86.0.tgz" \
+            package/template/android/app/debug.keystore > android/app/debug.keystore
+
+      - name: Build standalone APK
+        working-directory: android
+        run: ./gradlew --no-daemon --max-workers=2 assembleRelease
+
+      - name: Verify and package APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=android/app/build/outputs/apk/release/app-release.apk
+          tools="$ANDROID_HOME/build-tools/36.0.0"
+          "$tools/apksigner" verify "$apk"
+          "$tools/aapt" dump badging "$apk" > "$RUNNER_TEMP/baila-apk-metadata.txt"
+          grep -F "package: name='com.tbaila.v2'" "$RUNNER_TEMP/baila-apk-metadata.txt"
+          grep -Fx "application-label:'BAILA'" "$RUNNER_TEMP/baila-apk-metadata.txt"
+          grep -Fx "targetSdkVersion:'36'" "$RUNNER_TEMP/baila-apk-metadata.txt"
+          mkdir -p dist/android
+          cp "$apk" dist/android/BAILA.apk
+          (cd dist/android && sha256sum BAILA.apk > SHA256SUMS)
+
+      - name: Attach build files to this workflow run
+        uses: actions/upload-artifact@v4
+        with:
+          name: BAILA-Android
+          path: dist/android/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish Android test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="android-preview-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          gh release create "$tag" dist/android/BAILA.apk dist/android/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "BAILA Android preview (build $GITHUB_RUN_NUMBER)" \
+            --prerelease --notes-file docs/android-preview-notes.md

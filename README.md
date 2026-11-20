@@ -1,102 +1,69 @@
-# Baila v2
+# BAILA
 
-A mobile card game for three or more people, inspired by the Estonian game. Pick your card types, start a shuffled deck, and take turns swiping. Rules are available in English and Russian.
+A mobile card game with the original 28 card types, selectable decks, swipe gameplay, and English/Russian rules. The installed name is **BAILA**. The application ID remains `com.tbaila.v2`, so it installs alongside the original `com.tbaila` app.
 
-The interface uses a warm cream palette, coral actions, pale secondary buttons, and the original card illustrations. All 28 card types and their bilingual rules are retained.
+Home and gameplay use fixed layouts. Cards show artwork; **Details** opens the current card's rules. Changing EN/RU updates buttons, instructions, search, selection controls, accessibility labels, card details, and confirmation dialogs across the app.
 
-## Try the Android test build
+## Build and download on GitHub
 
-The installed app is named **Baila v2** and uses application ID `com.tbaila.v2`, so it can coexist with the original `com.tbaila` app. iOS uses the separate bundle ID `com.tbaila.v2` and the same display name. Both platforms use the supplied Baila artwork for their launcher icons, including square and round Android variants.
+Open [Build Android APK](https://github.com/giarous/baila-v2/actions/workflows/android-apk.yml), choose **Run workflow**, select `main`, and run it. When the run succeeds, download **BAILA.apk** from the new entry under [Releases](https://github.com/giarous/baila-v2/releases). The APK and checksum are also attached to the workflow run as `BAILA-Android`.
 
-[Download the standalone APK](artifacts/android/baila-v2-preview.apk?raw=true). On GitHub, you can also open that file and choose **Download raw file**. This development-signed build runs without Metro. See [build notes and known limitations](artifacts/android/README.md).
+The workflow is manual and does not run merely because code is pushed. It runs tests and lint, builds the standalone APK, verifies its signature and application metadata, and publishes a uniquely tagged development preview. The public React Native template signing key makes previews consistent across workflow runs without private signing secrets. Updating an earlier locally signed v2 build may require uninstalling that v2 build once; the original `com.tbaila` app can remain installed.
 
 ## Development
 
-This is a React Native 0.61.5 application, using React 16.9. Its legacy tooling works with **Node 12.22.12 and npm 6.14.16**. Use that runtime for the commands below; upgrading React Native is a separate migration.
+Use Node 22.13+ or Node 24.3+, npm, JDK 17, and an Android SDK. The project uses React Native 0.86, React 19, Hermes, Android compile/target SDK 36 (Android 16), build-tools 36.0.0, NDK 27.1.12297006, and the checksum-pinned Gradle 9.3.1 wrapper. Android 7.0/API 24 is the minimum supported OS.
 
 ```sh
-npm ci --no-optional
-npm start -- --max-workers 2
-```
-
-Metro serves native bundles; this project does not have a web target. For a connected device or emulator with a compatible native toolchain:
-
-```sh
+npm ci
+npm start
+# Another terminal, with an emulator or device connected:
 npm run android
-# macOS with Xcode and the project's CocoaPods dependencies:
-npm run ios
 ```
 
-Android uses Gradle 5.6.4, Android Gradle plugin 3.6.2, SDK platform 28, and build-tools 28.0.3. Use a compatible legacy JDK rather than the cloud image's JDK 21. The prepared cloud environment now includes this Android toolchain. The standalone release APK build has passed; physical-device review is still pending.
+Use the same development signing key as your earlier BAILA build to update that installed copy. The existing Android configuration expects an ignored local `android/app/debug.keystore`. Generate a standard Android debug key for a fresh development checkout; never commit signing keys. A new key requires uninstalling the earlier development build first.
 
-## Prepared cloud Android environment
-
-The toolchain is installed under `/workspace/.android-dev`. Activate it in each terminal:
+For a standalone test APK with JavaScript and images included:
 
 ```sh
-source /workspace/.android-dev/activate.sh
-cd /workspace/baila/android
-gradle --no-daemon --max-workers=2 -Dorg.gradle.jvmargs=-Xmx2g assembleRelease
+cd android
+./gradlew --no-daemon --max-workers=2 assembleRelease
 ```
 
-This uses the verified Gradle installation directly. The resulting universal APK is at `android/app/build/outputs/apk/release/app-universal-release.apk`. It embeds JavaScript and assets and can run without Metro. The existing release configuration signs it with a development key; it is a test build, not a store release. A copy is available at `/workspace/baila-preview/baila-v2-preview.apk`.
+Output: `android/app/build/outputs/apk/release/app-release.apk`. It uses development signing and is not a store release. The source uses the modern Android application template, including an exported launcher activity and safe-area handling for edge-to-edge display.
 
-The cloud machine has no KVM acceleration. A small Android 9 emulator is configured for software emulation:
-
-```sh
-source /workspace/.android-dev/activate.sh
-emulator -avd baila-api28 -no-window -no-audio -no-boot-anim \
-  -no-snapshot -accel off -gpu swiftshader -cores 2 -memory 2048 \
-  -camera-back none -camera-front none -no-metrics
-```
-
-In another terminal, wait for `adb shell getprop sys.boot_completed` to return `1`, then install and launch:
-
-```sh
-source /workspace/.android-dev/activate.sh
-adb install --no-streaming -r /workspace/baila/android/app/build/outputs/apk/release/app-x86_64-release.apk
-adb shell am start -n com.tbaila.v2/com.tbaila.MainActivity
-adb exec-out screencap -p > /workspace/baila-preview/home.png
-```
-
-Software emulation is slow on this machine. The prepared installation can be refreshed with `bash /workspace/.android-dev/install-native.sh`, which checks the downloaded JDK, Gradle, and Android command-line tools against official checksums and uses the cloud proxy's trusted CA store. Android's required user configuration path points to a writable workspace directory.
+On macOS with Xcode, install the iOS pods and run `npm run ios`. The iOS host has been updated to match React Native 0.86; its bundle identifier remains `com.tbaila.v2` and display name is BAILA. iOS builds require separate validation on macOS.
 
 ## Checks
 
 ```sh
 npm test -- --runInBand --watch=false
 npm run lint
-
-# Check the production JavaScript bundle without an Android SDK:
-mkdir -p /tmp/baila-bundle
-node node_modules/react-native/cli.js bundle \
-  --platform android --dev false --entry-file index.js \
-  --bundle-output /tmp/baila-bundle/index.android.bundle \
-  --assets-dest /tmp/baila-bundle/assets --max-workers 2
 ```
 
-Jest transforms the legacy navigation packages and loads the gesture handler's native mocks. Tests cover the render entry point, selection changes, empty-deck handling, bilingual rule lookup, deck composition, and progression through the real swiper. Native animations and touch behavior still need a device check.
+The tests cover deck composition, immutable selection, artwork-only cards, complete deck progression, and EN/RU switching across real screen navigation, card details, and exit dialogs. Native animation, touch, and OS compatibility should also be checked on a device.
+
+## Cloud environment
+
+Activate the modern build tools with `source /workspace/.android-dev/activate-modern.sh`. The old `activate.sh` selects the retired Node 12/JDK 11 build stack and must not be used for this version.
+
+Dependencies use the standard package-manager destinations plus `repo.reactnative.dev`, the download host to which Maven Central redirects the React Native 0.86 Android binary. The cloud proxy's CA store remains enabled for Java/Gradle downloads. If that destination is blocked, add it to environment network settings and save before rebuilding; do not disable verification.
+
+The current source passes JavaScript tests and lint. Local native release verification is blocked by access to that binary host. The manual GitHub workflow builds outside this cloud workspace and reports its actual native build result. The outdated APK has been removed from the current repository tree to avoid confusing it with the updated build; older commits retain it. A new APK is available only after a successful workflow run.
 
 ## Code structure
 
-| Location | Responsibility |
-| --- | --- |
-| `App.js` | Navigation routes and session provider |
-| `src/screens/` | Home, card selection, instructions, and active game |
-| `src/components/` | Shared screen shell, buttons, language picker, artwork, and playing card |
-| `src/state/GameContext.js` | Session card selection, rule language, and active deck |
-| `src/game/deck.js` | Immutable shuffle, deck construction, introductory rules, and language lookup |
-| `src/theme.js` | Shared design tokens |
-| `constants/photoCards.js` | Original illustrations and bilingual card rules |
-| `__tests__/` | Game logic, screen interactions, and swiper integration |
+| Location                   | Responsibility                                            |
+| -------------------------- | --------------------------------------------------------- |
+| `App.js`                   | Screen routing and Android back handling                  |
+| `src/screens/`             | Home, card selection, instructions, and gameplay          |
+| `src/components/`          | Shared controls, artwork, safe areas, and the swipe stack |
+| `src/state/GameContext.js` | Session selection, language, and active deck              |
+| `src/i18n.js`              | English and Russian interface strings                     |
+| `src/game/deck.js`         | Immutable deck construction, shuffling, and rule lookup   |
+| `constants/photoCards.js`  | Original bilingual card catalogue                         |
 
-Selection and language remain available while navigating during a session. They are not saved across app restarts, matching the original behavior. Every new game creates four copies of each enabled card type, shuffles them, and opens directly on the first playable card. General instructions remain available under How to play. The last swipe returns home. An empty selection disables starting a game. Game logic never mutates the source catalogue or an earlier deck.
-
-Home and gameplay use fixed layouts without scrolling. Gameplay cards show artwork only; the Details button opens the current rules in a native dialog using the selected language. Horizontal swipes or the Next card button advance the deck. Instructions can be searched using either English or Russian names. Selection controls expose checkbox state to accessibility services.
-
-## Device review
-
-Before shipping, check a small and large phone on Android and iOS: check that all three home buttons fit without scrolling, open card details, select and deselect cards, switch rule languages, swipe and use Next card, cancel and confirm leaving a game, and finish a deck. Verify safe areas, larger text sizes, and screen-reader labels on the device.
+Every game shuffles four copies of each enabled card type and starts directly on a card. The final swipe returns home. Empty selection disables starting a game. Selection and language remain shared while navigating during a session; they are not persisted across app restarts.
 
 ## License
 

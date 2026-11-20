@@ -7,9 +7,9 @@ it('starts directly with four copies of each enabled card', () => {
   const deck = createDeck(cards, () => 0.5);
 
   expect(deck).toHaveLength(8);
-  expect(deck.some(card => card.isIntroduction)).toBe(false);
-  cards.slice(0, 2).forEach(card => {
-    expect(deck.filter(item => item.name === card.name)).toHaveLength(4);
+  expect(deck.some((card) => card.isIntroduction)).toBe(false);
+  cards.slice(0, 2).forEach((card) => {
+    expect(deck.filter((item) => item.name === card.name)).toHaveLength(4);
   });
   expect(JSON.stringify(cards)).toBe(original);
   // A session owns its card objects; a later game cannot mutate this one.
@@ -21,9 +21,9 @@ it('starts directly with four copies of each enabled card', () => {
 it('supports the complete original catalogue and excludes disabled cards', () => {
   expect(photoCards).toHaveLength(28);
   expect(createDeck(photoCards)).toHaveLength(112);
-  expect(createDeck(photoCards.map(card => ({...card, state: false})))).toEqual(
-    [],
-  );
+  expect(
+    createDeck(photoCards.map((card) => ({...card, state: false}))),
+  ).toEqual([]);
 });
 
 it('shuffles without losing, duplicating, or mutating entries', () => {
@@ -35,7 +35,7 @@ it('shuffles without losing, duplicating, or mutating entries', () => {
 });
 
 it('preserves the English and Russian rule text', () => {
-  photoCards.forEach(card => {
+  photoCards.forEach((card) => {
     expect(localizeCard(card, 'en')).toEqual({
       title: card.name,
       description: card.description,

@@ -1,3 +1,4 @@
+import {useStrings} from '../i18n';
 import CardArtwork from '../components/CardArtwork';
 import React, {useState} from 'react';
 import {
@@ -14,12 +15,13 @@ import {introduction, localizeCard} from '../game/deck';
 import {colors} from '../theme';
 
 export default function InstructionsScreen({navigation}) {
+  const strings = useStrings();
   const {cards, language} = useGame();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState(null);
   const guide = localizeCard(introduction, language);
   // Search both languages so switching the rule language never hides a match.
-  const matching = cards.filter(card =>
+  const matching = cards.filter((card) =>
     `${card.name} ${card.name_ru}`
       .toLowerCase()
       .includes(query.trim().toLowerCase()),
@@ -31,22 +33,24 @@ export default function InstructionsScreen({navigation}) {
       <FlatList
         data={matching}
         extraData={{language, expanded}}
-        keyExtractor={card => card.name}
+        keyExtractor={(card) => card.name}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <View>
-            <Text style={[typography.title, styles.title]}>How to play</Text>
+            <Text style={[typography.title, styles.title]}>
+              {strings.howToPlay}
+            </Text>
             <View style={styles.guide}>
-              <Text style={styles.guideTitle}>{guide.title}</Text>
+              <Text style={styles.guideTitle}>{strings.basics}</Text>
               <Text style={styles.guideText}>{guide.description}</Text>
             </View>
-            <Text style={styles.sectionTitle}>Card rules</Text>
-            <Text style={typography.body}>Tap a card to read its rules.</Text>
+            <Text style={styles.sectionTitle}>{strings.cardRules}</Text>
+            <Text style={typography.body}>{strings.tapCard}</Text>
             <TextInput
-              accessibilityLabel="Search cards"
-              placeholder="Find a card…"
+              accessibilityLabel={strings.searchCards}
+              placeholder={strings.findCard}
               placeholderTextColor={colors.muted}
               value={query}
               onChangeText={setQuery}
@@ -55,9 +59,7 @@ export default function InstructionsScreen({navigation}) {
             />
           </View>
         }
-        ListEmptyComponent={
-          <Text style={styles.empty}>No cards found. Try another name.</Text>
-        }
+        ListEmptyComponent={<Text style={styles.empty}>{strings.noCards}</Text>}
         renderItem={({item}) => {
           const open = expanded === item.name;
           const content = localizeCard(item, language);
@@ -68,13 +70,11 @@ export default function InstructionsScreen({navigation}) {
                 accessibilityState={{expanded: open}}
                 accessibilityLabel={content.title}
                 onPress={() => setExpanded(open ? null : item.name)}
-                style={styles.ruleHeader}>
+                style={styles.ruleHeader}
+              >
                 <CardArtwork source={item.photo} style={styles.image} />
                 <View style={styles.ruleCopy}>
                   <Text style={styles.ruleTitle}>{content.title}</Text>
-                  <Text style={styles.translation}>
-                    {language === 'en' ? item.name_ru : item.name}
-                  </Text>
                 </View>
                 <Text style={styles.expand}>{open ? '−' : '+'}</Text>
               </TouchableOpacity>

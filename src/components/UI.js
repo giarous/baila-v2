@@ -1,6 +1,7 @@
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useStrings} from '../i18n';
 import React from 'react';
 import {
-  SafeAreaView,
   StatusBar,
   View,
   Text,
@@ -13,7 +14,7 @@ import {useGame} from '../state/GameContext';
 export function Screen({children}) {
   return (
     <SafeAreaView style={styles.screen}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="dark-content" />
       <View style={styles.content}>{children}</View>
     </SafeAreaView>
   );
@@ -32,7 +33,8 @@ export function Button({title, onPress, secondary, disabled, testID}) {
         styles.button,
         secondary && styles.secondary,
         disabled && styles.disabled,
-      ]}>
+      ]}
+    >
       <Text style={[styles.buttonText, secondary && styles.secondaryText]}>
         {title}
       </Text>
@@ -41,27 +43,28 @@ export function Button({title, onPress, secondary, disabled, testID}) {
 }
 
 export function LanguagePicker() {
+  const strings = useStrings();
   const {language, setLanguage} = useGame();
   return (
-    <View style={styles.languages} accessibilityLabel="Rules language">
-      {['en', 'ru'].map(value => (
+    <View style={styles.languages} accessibilityLabel={strings.language}>
+      {['en', 'ru'].map((value) => (
         <TouchableOpacity
           key={value}
+          testID={`language-${value}`}
           accessibilityRole="button"
           accessibilityLabel={
-            value === 'en' ? 'English rules' : 'Russian rules'
+            value === 'en' ? strings.english : strings.russian
           }
           accessibilityState={{selected: language === value}}
           onPress={() => setLanguage(value)}
-          style={[
-            styles.language,
-            language === value && styles.activeLanguage,
-          ]}>
+          style={[styles.language, language === value && styles.activeLanguage]}
+        >
           <Text
             style={[
               styles.languageText,
               language === value && styles.activeLanguageText,
-            ]}>
+            ]}
+          >
             {value.toUpperCase()}
           </Text>
         </TouchableOpacity>
@@ -71,13 +74,16 @@ export function LanguagePicker() {
 }
 
 export function Header({navigation, label = 'BAILA', onBack}) {
+  const strings = useStrings();
   return (
     <View style={styles.header}>
       <TouchableOpacity
         accessibilityRole="button"
-        accessibilityLabel="Back to home"
+        testID="back-home"
+        accessibilityLabel={strings.backHome}
         onPress={onBack || (() => navigation.goBack())}
-        style={styles.back}>
+        style={styles.back}
+      >
         <Text style={styles.backText}>‹</Text>
       </TouchableOpacity>
       <Text style={styles.wordmark}>{label}</Text>

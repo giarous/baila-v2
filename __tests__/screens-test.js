@@ -7,10 +7,10 @@ import SelectionScreen from '../src/screens/SelectionScreen';
 import InstructionsScreen from '../src/screens/InstructionsScreen';
 import GameScreen from '../src/screens/GameScreen';
 import PlayingCard from '../src/components/PlayingCard';
-import Swiper from 'react-native-deck-swiper';
+import Swiper from '../src/components/CardStack';
 
 // Gesture animations require a device; keep screen tests focused on the callbacks.
-jest.mock('react-native-deck-swiper', () => {
+jest.mock('../src/components/CardStack', () => {
   const ReactModule = require('react');
   return ReactModule.forwardRef((props, ref) => {
     ReactModule.useImperativeHandle(ref, () => ({swipeRight: jest.fn()}));
@@ -25,9 +25,9 @@ function Probe() {
   game = useGame();
   return null;
 }
-function mount(Screen) {
+async function mount(Screen) {
   navigation = {navigate: jest.fn(), goBack: jest.fn(), popToTop: jest.fn()};
-  act(() => {
+  await act(async () => {
     app = renderer.create(
       <GameProvider>
         <Probe />
@@ -40,62 +40,66 @@ function textIncludes(value) {
   return app.root
     .findAllByType(Text)
     .some(
-      node =>
+      (node) =>
         typeof node.props.children === 'string' &&
         node.props.children.includes(value),
     );
 }
-afterEach(() => {
+afterEach(async () => {
   jest.restoreAllMocks();
   if (app) {
-    act(() => app.unmount());
+    await act(async () => app.unmount());
   }
 });
 
-it('updates selection immutably and retains it when starting a new game', () => {
-  mount(SelectionScreen);
+it('updates selection immutably and retains it when starting a new game', async () => {
+  await mount(SelectionScreen);
   const original = game.cards;
   const barman = app.root.findByProps({
     accessibilityRole: 'checkbox',
     accessibilityLabel: 'Barman',
   });
-  act(() => barman.props.onPress());
+  await act(async () => barman.props.onPress());
   expect(original[0].state).toBe(true);
   expect(game.cards[0].state).toBe(false);
   expect(barman.props.accessibilityState.checked).toBe(false);
-  act(() => {
+  await act(async () => {
     game.startGame();
   });
   expect(game.deck).toHaveLength(108);
-  expect(game.deck.some(card => card.name === 'Barman')).toBe(false);
+  expect(game.deck.some((card) => card.name === 'Barman')).toBe(false);
 });
 
-it('prevents an empty game and permits starting again after selection', () => {
-  mount(HomeScreen);
-  act(() => game.selectAll(false));
+it('prevents an empty game and permits starting again after selection', async () => {
+  await mount(HomeScreen);
+  await act(async () => game.selectAll(false));
   expect(app.root.findByProps({testID: 'start-game'}).props.disabled).toBe(
     true,
   );
-  act(() => app.root.findByProps({testID: 'start-game'}).props.onPress());
+  await act(async () =>
+    app.root.findByProps({testID: 'start-game'}).props.onPress(),
+  );
   expect(navigation.navigate).not.toHaveBeenCalled();
-  act(() => game.toggleCard('Barman'));
-  act(() => app.root.findByProps({testID: 'start-game'}).props.onPress());
+  await act(async () => game.toggleCard('Barman'));
+  await act(async () =>
+    app.root.findByProps({testID: 'start-game'}).props.onPress(),
+  );
   expect(navigation.navigate).toHaveBeenCalledWith('NewGame');
   expect(game.deck).toHaveLength(4);
 });
 
-it('searches bilingual names, expands rules, and switches their language', () => {
-  mount(InstructionsScreen);
+it('searches bilingual names, expands rules, and switches their language', async () => {
+  await mount(InstructionsScreen);
   const search = app.root.findByType(TextInput);
-  act(() => search.props.onChangeText('Бармен'));
-  act(() =>
+  await act(async () => search.props.onChangeText('Бармен'));
+  await act(async () =>
     app.root
       .findByProps({accessibilityRole: 'button', accessibilityLabel: 'Barman'})
       .props.onPress(),
   );
   expect(textIncludes(game.cards[0].description)).toBe(true);
-  act(() =>
-    app.root.findByProps({accessibilityLabel: 'Russian rules'}).props.onPress(),
+  await act(async () =>
+    app.root.findByProps({accessibilityLabel: 'Russian'}).props.onPress(),
   );
   expect(textIncludes(game.cards[0].description_ru)).toBe(true);
   expect(
@@ -104,50 +108,50 @@ it('searches bilingual names, expands rules, and switches their language', () =>
       accessibilityLabel: 'Бармен',
     }).props.accessibilityState.expanded,
   ).toBe(true);
-  act(() => search.props.onChangeText('nothing matches this'));
-  expect(textIncludes('No cards found')).toBe(true);
+  await act(async () => search.props.onChangeText('nothing matches this'));
+  expect(textIncludes('Карты не найдены')).toBe(true);
 });
 
-it('selects and clears the whole catalogue', () => {
-  mount(SelectionScreen);
+it('selects and clears the whole catalogue', async () => {
+  await mount(SelectionScreen);
   const toggle = () =>
     app.root
       .findAllByProps({accessibilityRole: 'button'})
-      .find(node =>
+      .find((node) =>
         node
           .findAllByType(Text)
-          .some(text =>
+          .some((text) =>
             ['Select all', 'Clear all'].includes(text.props.children),
           ),
       );
-  act(() => toggle().props.onPress());
-  expect(game.cards.every(card => !card.state)).toBe(true);
-  act(() => toggle().props.onPress());
-  expect(game.cards.every(card => card.state)).toBe(true);
+  await act(async () => toggle().props.onPress());
+  expect(game.cards.every((card) => !card.state)).toBe(true);
+  await act(async () => toggle().props.onPress());
+  expect(game.cards.every((card) => card.state)).toBe(true);
 });
 
-it('advances the card counter and returns home when the deck is exhausted', () => {
-  mount(GameScreen);
-  act(() => {
+it('advances the card counter and returns home when the deck is exhausted', async () => {
+  await mount(GameScreen);
+  await act(async () => {
     game.startGame();
   });
   const stage = app.root.findAll(
-    node => typeof node.props.onLayout === 'function',
+    (node) => typeof node.props.onLayout === 'function',
   )[0];
-  act(() =>
+  await act(async () =>
     stage.props.onLayout({nativeEvent: {layout: {width: 320, height: 450}}}),
   );
   let swiper = app.root.findByType(Swiper);
   expect(swiper.props.cards).toHaveLength(112);
-  act(() => swiper.props.onSwiped(0));
+  await act(async () => swiper.props.onSwiped(0));
   expect(textIncludes('2 / 112')).toBe(true);
   swiper = app.root.findByType(Swiper);
-  act(() => swiper.props.onSwipedAll());
+  await act(async () => swiper.props.onSwipedAll());
   expect(navigation.popToTop).toHaveBeenCalled();
 });
 
-it('keeps home fixed with three equally structured actions and no marketing copy', () => {
-  mount(HomeScreen);
+it('keeps home fixed with three equally structured actions and no marketing copy', async () => {
+  await mount(HomeScreen);
   expect(app.root.findAllByType(ScrollView)).toHaveLength(0);
   for (const [id, route] of [
     ['choose-cards', 'Settings'],
@@ -155,45 +159,45 @@ it('keeps home fixed with three equally structured actions and no marketing copy
   ]) {
     const action = app.root.findByProps({testID: id});
     expect(action.props.secondary).toBe(true);
-    act(() => action.props.onPress());
+    await act(async () => action.props.onPress());
     expect(navigation.navigate).toHaveBeenCalledWith(route);
   }
   expect(textIncludes('Less scrolling.')).toBe(false);
 });
 
-it('shows rules only when Details is pressed, in the selected language', () => {
+it('shows rules only when Details is pressed, in the selected language', async () => {
   const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
-  mount(GameScreen);
-  act(() => {
+  await mount(GameScreen);
+  await act(async () => {
     game.startGame();
   });
   expect(alert).not.toHaveBeenCalled();
   expect(app.root.findAllByType(ScrollView)).toHaveLength(0);
   const details = () =>
     app.root.findByProps({testID: 'card-details'}).props.onPress();
-  act(() => details());
+  await act(async () => details());
   expect(alert).toHaveBeenLastCalledWith(
     game.deck[0].name,
     game.deck[0].description,
     expect.any(Array),
   );
-  act(() => {
+  await act(async () => {
     game.setLanguage('ru');
   });
-  act(() => details());
+  await act(async () => details());
   expect(alert).toHaveBeenLastCalledWith(
     game.deck[0].name_ru,
     game.deck[0].description_ru,
     [{text: 'Закрыть'}],
   );
   const stage = app.root.findAll(
-    node => typeof node.props.onLayout === 'function',
+    (node) => typeof node.props.onLayout === 'function',
   )[0];
-  act(() =>
+  await act(async () =>
     stage.props.onLayout({nativeEvent: {layout: {width: 320, height: 450}}}),
   );
-  act(() => app.root.findByType(Swiper).props.onSwiped(0));
-  act(() => details());
+  await act(async () => app.root.findByType(Swiper).props.onSwiped(0));
+  await act(async () => details());
   expect(alert).toHaveBeenLastCalledWith(
     game.deck[1].name_ru,
     game.deck[1].description_ru,
@@ -201,8 +205,8 @@ it('shows rules only when Details is pressed, in the selected language', () => {
   );
 });
 
-it('renders gameplay cards as artwork without inline text or scrolling', () => {
-  mount(() => (
+it('renders gameplay cards as artwork without inline text or scrolling', async () => {
+  await mount(() => (
     <PlayingCard
       card={{
         name: 'Test card',

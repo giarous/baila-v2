@@ -6,19 +6,21 @@ const GameContext = createContext(null);
 
 export function GameProvider({children}) {
   // Selection belongs to the session, not to route params or module globals.
-  const [cards, setCards] = useState(() => photoCards.map(card => ({...card})));
+  const [cards, setCards] = useState(() =>
+    photoCards.map((card) => ({...card})),
+  );
   const [language, setLanguage] = useState('en');
   const [deck, setDeck] = useState([]);
 
-  const toggleCard = name => {
-    setCards(current =>
-      current.map(card =>
+  const toggleCard = (name) => {
+    setCards((current) =>
+      current.map((card) =>
         card.name === name ? {...card, state: !card.state} : card,
       ),
     );
   };
-  const selectAll = selected => {
-    setCards(current => current.map(card => ({...card, state: selected})));
+  const selectAll = (selected) => {
+    setCards((current) => current.map((card) => ({...card, state: selected})));
   };
   const startGame = () => {
     const nextDeck = createDeck(cards);
@@ -36,7 +38,8 @@ export function GameProvider({children}) {
         toggleCard,
         selectAll,
         startGame,
-      }}>
+      }}
+    >
       {children}
     </GameContext.Provider>
   );

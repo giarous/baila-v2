@@ -1,3 +1,4 @@
+import {useStrings} from '../i18n';
 import React from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import {Screen, Button, LanguagePicker} from '../components/UI';
@@ -5,8 +6,9 @@ import {useGame} from '../state/GameContext';
 import {colors} from '../theme';
 
 export default function HomeScreen({navigation}) {
+  const strings = useStrings();
   const {cards, startGame} = useGame();
-  const selected = cards.some(card => card.state);
+  const selected = cards.some((card) => card.state);
   const play = () => {
     if (startGame()) {
       navigation.navigate('NewGame');
@@ -16,36 +18,34 @@ export default function HomeScreen({navigation}) {
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={styles.logo}>baila v2</Text>
+        <Text style={styles.logo}>BAILA</Text>
         <LanguagePicker />
       </View>
       <View style={styles.artwork}>
         <Image
           source={require('../../assets/branding/baila-v2-icon.png')}
-          accessibilityLabel="Baila"
+          accessibilityLabel="BAILA"
           style={styles.image}
         />
       </View>
       <View style={styles.actions}>
-        {!selected && (
-          <Text style={styles.empty}>Choose a card type to play.</Text>
-        )}
+        {!selected && <Text style={styles.empty}>{strings.chooseType}</Text>}
         <Button
-          title="Let’s play"
+          title={strings.play}
           onPress={play}
           disabled={!selected}
           testID="start-game"
         />
         <View style={styles.space} />
         <Button
-          title="Make it your deck"
+          title={strings.chooseDeck}
           secondary
           onPress={() => navigation.navigate('Settings')}
           testID="choose-cards"
         />
         <View style={styles.space} />
         <Button
-          title="How to play"
+          title={strings.howToPlay}
           secondary
           onPress={() => navigation.navigate('Descriptions')}
           testID="how-to-play"

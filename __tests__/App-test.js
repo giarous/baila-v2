@@ -2,15 +2,15 @@ import React from 'react';
 import renderer, {act} from 'react-test-renderer';
 import App from '../App';
 
-it('opens directly on the redesigned home screen', () => {
+it('opens directly on the redesigned home screen', async () => {
   let app;
-  act(() => {
+  await act(async () => {
     app = renderer.create(<App />);
   });
   expect(app.root.findByProps({testID: 'start-game'}).props.disabled).toBe(
     false,
   );
-  act(() => {
+  await act(async () => {
     app.unmount();
   });
 });

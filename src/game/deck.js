@@ -23,12 +23,12 @@ export function shuffle(cards, random = Math.random) {
 
 /** Start directly with the shuffled cards: four copies per enabled type. */
 export function createDeck(cards, random = Math.random) {
-  const enabled = cards.filter(card => card.state);
+  const enabled = cards.filter((card) => card.state);
   if (!enabled.length) {
     return [];
   }
   const copies = [];
-  enabled.forEach(card => {
+  enabled.forEach((card) => {
     for (let copy = 0; copy < COPIES_PER_CARD; copy += 1) {
       copies.push({...card});
     }
