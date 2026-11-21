@@ -71,8 +71,14 @@ export default function SelectionScreen({navigation}) {
                     </Text>
                   </View>
                 </View>
-                <CardArtwork source={item.photo} style={styles.image} />
-                <Text style={styles.cardName}>{title}</Text>
+                <View style={styles.artwork}>
+                  <CardArtwork source={item.photo} style={styles.image} />
+                </View>
+                <View style={styles.cardFooter}>
+                  <Text style={styles.cardName} numberOfLines={2}>
+                    {title}
+                  </Text>
+                </View>
               </TouchableOpacity>
               {/* A sibling button keeps opening rules separate from deck selection. */}
               <TouchableOpacity
@@ -86,7 +92,6 @@ export default function SelectionScreen({navigation}) {
                 <Text accessible={false} style={styles.infoIcon}>
                   ⓘ
                 </Text>
-                <Text style={styles.infoText}>{strings.info}</Text>
               </TouchableOpacity>
             </View>
           );
@@ -119,6 +124,7 @@ const styles = StyleSheet.create({
   row: {justifyContent: 'space-between'},
   tile: {
     width: '48%',
+    aspectRatio: 3 / 4,
     backgroundColor: colors.paper,
     borderWidth: 2,
     borderColor: colors.line,
@@ -127,27 +133,27 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   selectedTile: {borderColor: colors.teal},
-  selection: {flex: 1, padding: 8, paddingBottom: 4},
+  selection: {flex: 1, minHeight: 0, padding: 8},
+  artwork: {flex: 1, minHeight: 0, alignItems: 'center'},
+  cardFooter: {minHeight: 44, justifyContent: 'center', paddingRight: 52},
   infoButton: {
-    minHeight: 44,
-    marginHorizontal: 8,
-    marginBottom: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 10,
+    position: 'absolute',
+    right: 8,
+    bottom: 8,
+    width: 44,
+    height: 44,
     borderRadius: 12,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.tealLight,
   },
-  infoIcon: {fontSize: 18, color: colors.teal, marginRight: 6},
-  infoText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.teal,
-    flexShrink: 1,
-  },
+  infoIcon: {fontSize: 22, color: colors.teal},
   tileTop: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    right: 8,
+    zIndex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -165,8 +171,8 @@ const styles = StyleSheet.create({
   checked: {backgroundColor: colors.teal, borderColor: colors.teal},
   checkText: {color: colors.paper, fontWeight: '800', fontSize: 14},
   image: {
-    width: '100%',
-    marginVertical: 4,
+    height: '100%',
+    maxWidth: '100%',
   },
   cardName: {
     color: colors.ink,

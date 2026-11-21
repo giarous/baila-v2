@@ -5,7 +5,7 @@
 - Android 16/API 36 target; Android 7/API 24 or newer required.
 - Interface, instructions, selection, card details, and dialogs follow the EN/RU switch.
 - Fixed home/game layouts with artwork-only cards and a Details button.
-- Larger artwork in deck selection and a separate Info button on every card.
+- Compact 3:4 deck-selection cards with fitted artwork and a separate Info button on every card.
 
 This is a development-signed preview, not a Google Play release. Automated checks validate the tests, lint, APK signature, display name, application ID, and Android target. Physical-device review is still needed. iOS has not been built in this Linux environment.
 
