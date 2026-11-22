@@ -11,7 +11,14 @@ export const introduction = {
   isIntroduction: true,
 };
 
-/** Fisher–Yates returns a new array; the card catalogue is never reordered. */
+/**
+ * Fisher–Yates returns a new array; the shared catalogue is never reordered.
+ * Injecting randomness makes game rules testable without relying on lucky draws.
+ * @template T
+ * @param {T[]} cards
+ * @param {() => number} random A generator returning a value in [0, 1).
+ * @returns {T[]}
+ */
 export function shuffle(cards, random = Math.random) {
   const result = cards.slice();
   for (let index = result.length - 1; index > 0; index -= 1) {
@@ -21,7 +28,10 @@ export function shuffle(cards, random = Math.random) {
   return result;
 }
 
-/** Start directly with the shuffled cards: four copies per enabled type. */
+/**
+ * Create a session-owned deck: four copies per enabled type, no introduction card.
+ * Copies are independent of selection state; an empty selection cannot start play.
+ */
 export function createDeck(cards, random = Math.random) {
   const enabled = cards.filter((card) => card.state);
   if (!enabled.length) {
@@ -36,6 +46,7 @@ export function createDeck(cards, random = Math.random) {
   return shuffle(copies, random);
 }
 
+/** Resolve catalogue copy at render time so a language change is immediate. */
 export function localizeCard(card, language) {
   return language === 'ru'
     ? {title: card.name_ru, description: card.description_ru}

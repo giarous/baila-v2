@@ -1,7 +1,7 @@
-import {useStrings} from '../i18n';
 import React from 'react';
+import {useStrings} from '../i18n';
 import {View, Text, Image, StyleSheet} from 'react-native';
-import {Screen, Button, LanguagePicker} from '../components/UI';
+import {Screen, Button, LanguagePicker} from '../components/ui';
 import {useGame} from '../state/GameContext';
 import {colors} from '../theme';
 
@@ -62,14 +62,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 12,
   },
-  logo: {fontSize: 24, fontWeight: '800', color: colors.ink},
+  logo: {fontSize: 24, fontWeight: '800', color: colors.text},
   // The art gives up space before the controls do on smaller phones.
   artwork: {flex: 1, minHeight: 0, marginVertical: 20},
   image: {flex: 1, width: '100%', resizeMode: 'contain'},
   actions: {paddingBottom: 16},
   space: {height: 10},
   empty: {
-    color: colors.coral,
+    color: colors.primary,
     textAlign: 'center',
     marginBottom: 10,
     fontSize: 13,

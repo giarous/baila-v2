@@ -8,10 +8,15 @@ import React, {
 } from 'react';
 import {Animated, PanResponder, StyleSheet, View} from 'react-native';
 
+const DRAG_ACTIVATION_DISTANCE = 10;
+const SWIPE_COMMIT_DISTANCE = 60;
+const SWIPE_DURATION_MS = 180;
+
 /** A horizontal swipe deck built on supported React Native animation primitives. */
 const CardStack = forwardRef(function CardStack(props, ref) {
   const position = useRef(new Animated.ValueXY()).current;
   const busy = useRef(false);
+  // Gesture handlers stay stable, but must read the current card and callbacks.
   const latest = useRef(props);
   latest.current = props;
 
@@ -29,7 +34,7 @@ const CardStack = forwardRef(function CardStack(props, ref) {
       current.onSwiping?.();
       Animated.timing(position, {
         toValue: {x: direction * current.cardStyle.width * 1.4, y: 0},
-        duration: 180,
+        duration: SWIPE_DURATION_MS,
         useNativeDriver: true,
       }).start(({finished}) => {
         busy.current = false;
@@ -52,13 +57,13 @@ const CardStack = forwardRef(function CardStack(props, ref) {
       PanResponder.create({
         onMoveShouldSetPanResponder: (_, gesture) =>
           !busy.current &&
-          Math.abs(gesture.dx) > 10 &&
+          Math.abs(gesture.dx) > DRAG_ACTIVATION_DISTANCE &&
           Math.abs(gesture.dx) > Math.abs(gesture.dy),
         onPanResponderGrant: () => latest.current.onSwiping?.(),
         onPanResponderMove: (_, gesture) =>
           position.setValue({x: gesture.dx, y: 0}),
         onPanResponderRelease: (_, gesture) => {
-          if (Math.abs(gesture.dx) > 60) {
+          if (Math.abs(gesture.dx) > SWIPE_COMMIT_DISTANCE) {
             advance(gesture.dx > 0 ? 1 : -1);
           } else {
             Animated.spring(position, {

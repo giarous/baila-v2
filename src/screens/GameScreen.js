@@ -1,8 +1,8 @@
-import {useStrings} from '../i18n';
 import React, {useRef, useState} from 'react';
+import {useStrings} from '../i18n';
 import {View, Text, Alert, StyleSheet} from 'react-native';
 import CardStack from '../components/CardStack';
-import {Screen, Header, Button} from '../components/UI';
+import {Screen, Header, Button} from '../components/ui';
 import PlayingCard from '../components/PlayingCard';
 import {useGame} from '../state/GameContext';
 import {localizeCard} from '../game/deck';
@@ -110,5 +110,5 @@ const styles = StyleSheet.create({
   controls: {flexDirection: 'row', paddingTop: 8, paddingBottom: 16},
   details: {flex: 1, marginRight: 10},
   next: {flex: 1},
-  empty: {color: colors.muted, textAlign: 'center', paddingTop: 24},
+  empty: {color: colors.textMuted, textAlign: 'center', paddingTop: 24},
 });

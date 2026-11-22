@@ -1,6 +1,6 @@
+import React, {useState} from 'react';
 import {useStrings} from '../i18n';
 import CardArtwork from '../components/CardArtwork';
-import React, {useState} from 'react';
 import {
   FlatList,
   View,
@@ -9,10 +9,10 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import {Screen, Header, typography} from '../components/UI';
+import {Screen, Header} from '../components/ui';
 import {useGame} from '../state/GameContext';
 import {introduction, localizeCard} from '../game/deck';
-import {colors} from '../theme';
+import {colors, typography} from '../theme';
 
 export default function InstructionsScreen({navigation}) {
   const strings = useStrings();
@@ -51,7 +51,7 @@ export default function InstructionsScreen({navigation}) {
             <TextInput
               accessibilityLabel={strings.searchCards}
               placeholder={strings.findCard}
-              placeholderTextColor={colors.muted}
+              placeholderTextColor={colors.textMuted}
               value={query}
               onChangeText={setQuery}
               autoCorrect={false}
@@ -93,37 +93,41 @@ const styles = StyleSheet.create({
   list: {paddingBottom: 24},
   title: {marginTop: 12, marginBottom: 24},
   guide: {
-    backgroundColor: colors.teal,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 24,
     padding: 22,
     marginBottom: 28,
   },
   guideTitle: {
-    color: colors.paper,
+    color: colors.text,
     fontSize: 19,
     fontWeight: '700',
     marginBottom: 12,
   },
-  guideText: {color: colors.paper, fontSize: 14, lineHeight: 23},
+  guideText: {color: colors.text, fontSize: 14, lineHeight: 23},
   sectionTitle: {
     fontSize: 23,
     fontWeight: '800',
-    color: colors.ink,
+    color: colors.text,
     marginBottom: 6,
   },
   search: {
-    backgroundColor: colors.paper,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: colors.border,
     borderRadius: 16,
     minHeight: 52,
     paddingHorizontal: 16,
-    color: colors.ink,
+    color: colors.text,
     marginVertical: 18,
     fontSize: 15,
   },
   rule: {
-    backgroundColor: colors.paper,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 18,
     marginBottom: 10,
     overflow: 'hidden',
@@ -131,15 +135,14 @@ const styles = StyleSheet.create({
   ruleHeader: {flexDirection: 'row', alignItems: 'center', padding: 14},
   image: {width: 36, height: 54, marginRight: 14},
   ruleCopy: {flex: 1},
-  ruleTitle: {fontSize: 15, color: colors.ink, fontWeight: '700'},
-  translation: {fontSize: 12, color: colors.muted, marginTop: 5},
-  expand: {fontSize: 24, color: colors.teal, paddingLeft: 12},
+  ruleTitle: {fontSize: 15, color: colors.text, fontWeight: '700'},
+  expand: {fontSize: 24, color: colors.accentText, paddingLeft: 12},
   description: {
-    color: colors.muted,
+    color: colors.textMuted,
     fontSize: 15,
     lineHeight: 24,
     paddingHorizontal: 18,
     paddingBottom: 20,
   },
-  empty: {color: colors.muted, textAlign: 'center', padding: 20},
+  empty: {color: colors.textMuted, textAlign: 'center', padding: 20},
 });

@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     overflow: 'hidden',
     borderRadius: 6,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.surface,
   },
   image: {
     width: '100%',

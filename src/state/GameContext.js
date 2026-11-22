@@ -4,6 +4,7 @@ import {createDeck} from '../game/deck';
 
 const GameContext = createContext(null);
 
+/** In-memory session state, deliberately kept above navigation to survive route changes. */
 export function GameProvider({children}) {
   // Selection belongs to the session, not to route params or module globals.
   const [cards, setCards] = useState(() =>
