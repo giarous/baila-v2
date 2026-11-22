@@ -50,10 +50,10 @@ export default function GameScreen({navigation}) {
       <Header
         navigation={navigation}
         onBack={exit}
-        label={
+        progress={
           deck.length
             ? `${Math.min(index + 1, deck.length)} / ${deck.length}`
-            : 'BAILA'
+            : undefined
         }
       />
       <View style={styles.stage} onLayout={measure}>

@@ -27,11 +27,6 @@ These images capture the **actual app components rendered in a browser for docum
 </tr>
 </table>
 
-## Branches
-
-- **`main`** — English-only interface, card rules, and documentation previews. No language switch or localization layer.
-- **[`multilingual`](https://github.com/giarous/baila-v2/tree/multilingual)** — the preserved English/Russian version with language switching.
-
 ## What you can do
 
 - Build a custom deck from 28 card types, with four copies of every selected type.
@@ -74,9 +69,9 @@ npm run format:check
 
 The installed name is **BAILA**. Its application ID is `com.tbaila.v2`, allowing it to coexist with the original app. APKs are attached to [GitHub Releases](https://github.com/giarous/baila-v2/releases), not committed into the source tree. A new APK is produced only after running the manual build workflow. These are development-signed previews, not Google Play releases. iOS sources are included but require validation on macOS.
 
-## Project ownership and AI assistance
+## Project ownership
 
-A personal project by [giarous](https://github.com/giarous). The Classic BAILA redesign, component restructuring, and portfolio documentation were implemented with **OpenAI Codex**, following the owner's direction. The related commits explicitly identify this AI assistance.
+A personal project by [giarous](https://github.com/giarous).
 
 ## Credits and rights
 

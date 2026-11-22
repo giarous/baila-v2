@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
-import {Alert, Text, TextInput} from 'react-native';
+import {Alert, Image, Text, TextInput} from 'react-native';
 import App from '../App';
 import {strings} from '../src/content';
 import {photoCards} from '../constants';
@@ -19,7 +19,8 @@ it('keeps the complete navigation flow, rules, and dialogs English-only', async 
     await act(async () => {
       app = renderer.create(<App />);
     });
-    expect(hasText('BAILA')).toBe(true);
+    expect(hasText('BAILA')).toBe(false);
+    expect(app.root.findByType(Image).props.accessibilityLabel).toBe('BAILA');
     expect(
       app.root.findAll(
         (node) =>

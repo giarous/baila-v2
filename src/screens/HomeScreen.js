@@ -16,9 +16,6 @@ export default function HomeScreen({navigation}) {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <Text style={styles.logo}>BAILA</Text>
-      </View>
       <View style={styles.artwork}>
         <Image
           source={require('../../assets/branding/baila-v2-icon.png')}
@@ -54,15 +51,8 @@ export default function HomeScreen({navigation}) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 12,
-  },
-  logo: {fontSize: 24, fontWeight: '800', color: colors.text},
   // The art gives up space before the controls do on smaller phones.
-  artwork: {flex: 1, minHeight: 0, marginVertical: 20},
+  artwork: {flex: 1, minHeight: 0, marginHorizontal: -8, marginVertical: 20},
   image: {flex: 1, width: '100%', resizeMode: 'contain'},
   actions: {paddingBottom: 16},
   space: {height: 10},

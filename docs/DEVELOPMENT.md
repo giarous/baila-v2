@@ -87,4 +87,4 @@ The distinct application ID permits side-by-side installation with the original 
 
 On macOS with Xcode, install the iOS pods and run `npm run ios`. The iOS host targets the current React Native version, but has not been built or validated in this Linux environment.
 
-In the managed cloud workspace, activate the current tools with `source /workspace/.android-dev/activate-modern.sh` when available. React Native's Android artifact downloads redirect to `repo.reactnative.dev`; blocked access to that host prevents a local native build. Keep TLS verification enabled. Use the GitHub workflow to build outside this workspace when its network policy blocks that dependency.
+React Native's Android artifact downloads redirect to `repo.reactnative.dev`. If your network blocks that host, use the GitHub workflow to build the APK.
