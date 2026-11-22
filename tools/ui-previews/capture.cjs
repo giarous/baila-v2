@@ -92,7 +92,7 @@ async function capture() {
       args: ['--no-sandbox', '--disable-dev-shm-usage'],
     });
     const page = await browser.newPage({
-      viewport: {width: 390, height: 844},
+      viewport: {width: 360, height: 640},
       deviceScaleFactor: 2,
     });
     const errors = [];
