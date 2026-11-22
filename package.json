@@ -5,9 +5,12 @@
   "scripts": {
     "android": "react-native run-android --appId com.tbaila.v2",
     "ios": "react-native run-ios",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .js,.jsx,.cjs",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "screenshots": "npm --prefix tools/ui-previews run capture",
+    "format": "prettier --write App.js \"src/**/*.js\" \"tools/ui-previews/*.{cjs,jsx,json}\" README.md \"docs/*.md\" \".github/workflows/*.yml\" package.json",
+    "format:check": "prettier --check App.js \"src/**/*.js\" \"tools/ui-previews/*.{cjs,jsx,json}\" README.md \"docs/*.md\" \".github/workflows/*.yml\" package.json"
   },
   "dependencies": {
     "react": "19.2.3",

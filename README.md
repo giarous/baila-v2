@@ -1,72 +1,85 @@
 # BAILA
 
-A mobile card game with the original 28 card types, selectable decks, swipe gameplay, and English/Russian rules. The installed name is **BAILA**. The application ID remains `com.tbaila.v2`, so it installs alongside the original `com.tbaila` app.
+### A playful mobile card game, built with React Native
 
-Deck selection uses compact 3:4 cards with proportionally fitted illustrations. Each selection tile has an Info button that shows its localized rules without changing selection.
+![React Native](https://img.shields.io/badge/React_Native-0.86-237D39?logo=react&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES_Modules-F7DF1E?logo=javascript&logoColor=black)
+![Android](https://img.shields.io/badge/Android-API_24%2B-237D39?logo=android&logoColor=white)
+![Languages](https://img.shields.io/badge/Languages-English_%2F_Russian-007A9E)
 
-Home and gameplay use fixed layouts. Cards show artwork; **Details** opens the current card's rules. Changing EN/RU updates buttons, instructions, search, selection controls, accessibility labels, card details, and confirmation dialogs across the app.
+Choose your cards, shuffle the deck, and play together. BAILA brings 28 illustrated card types to a simple mobile interface with swipe navigation and rules available whenever you need them.
 
-## Build and download on GitHub
+[**Download Android preview**](https://github.com/giarous/baila-v2/releases) · [Build an APK](https://github.com/giarous/baila-v2/actions/workflows/android-apk.yml) · [Architecture](docs/ARCHITECTURE.md) · [Development guide](docs/DEVELOPMENT.md)
 
-Open [Build Android APK](https://github.com/giarous/baila-v2/actions/workflows/android-apk.yml), choose **Run workflow**, select `main`, and run it. When the run succeeds, download **BAILA.apk** from the new entry under [Releases](https://github.com/giarous/baila-v2/releases). The APK and checksum are also attached to the workflow run as `BAILA-Android`.
+## A look inside
 
-The workflow is manual and does not run merely because code is pushed. It runs tests and lint, builds the standalone APK, verifies its signature and application metadata, and publishes a uniquely tagged development preview. The public React Native template signing key makes previews consistent across workflow runs without private signing secrets. Updating an earlier locally signed v2 build may require uninstalling that v2 build once; the original `com.tbaila` app can remain installed.
+The **Classic BAILA** palette takes its green and cyan accents from the game logo, with a pale green background and clean white cards.
 
-## Development
+These images capture the **actual app components rendered in a browser for documentation**. They are not Android device screenshots; native fonts, dialogs, safe areas, and system chrome may differ. The capture script uses the production screens rather than a separate mockup.
 
-Use Node 22.13+ or Node 24.3+, npm, JDK 17, and an Android SDK. The project uses React Native 0.86, React 19, Hermes, Android compile/target SDK 36 (Android 16), build-tools 36.0.0, NDK 27.1.12297006, and the checksum-pinned Gradle 9.3.1 wrapper. Android 7.0/API 24 is the minimum supported OS.
+<table>
+<tr><th>Home</th><th>Your deck</th><th>Gameplay</th><th>How to play</th></tr>
+<tr>
+<td><img src="docs/screenshots/home.png" width="210" alt="BAILA home with green play button and pale green secondary buttons"></td>
+<td><img src="docs/screenshots/deck.png" width="210" alt="Compact illustrated selection cards with individual information buttons"></td>
+<td><img src="docs/screenshots/game.png" width="210" alt="Artwork-focused gameplay with Details and Next card controls"></td>
+<td><img src="docs/screenshots/instructions.png" width="210" alt="Searchable rules with expandable card descriptions"></td>
+</tr>
+</table>
+
+<details>
+<summary>See the Russian interface</summary>
+
+<img src="docs/screenshots/home-ru.png" width="260" alt="BAILA home with Russian button labels">
+
+</details>
+
+## What you can do
+
+- Build a custom deck from 28 card types, with four copies of every selected type.
+- Check any card's rules from its independent Info button without changing your selection.
+- Swipe through a shuffled deck or use Next card. Gameplay keeps the artwork visible and opens rules through Details.
+- Search and expand card instructions, and switch between English and Russian throughout the interface, including dialogs and accessibility labels.
+
+Home and gameplay use fixed layouts. Deck selection uses compact 3:4 tiles. Language and deck selection survive navigation during a session; they reset when the app restarts. No account or backend is required.
+
+## Engineering decisions
+
+| Concern      | Approach                                                                                            |
+| ------------ | --------------------------------------------------------------------------------------------------- |
+| Presentation | Dedicated screen components, reusable UI controls, and semantic design tokens                       |
+| State        | A session provider above a small four-screen router                                                 |
+| Game logic   | Pure deck construction and immutable Fisher–Yates shuffling, with injectable randomness for testing |
+| Localization | Shared interface translations and bilingual card data resolved at render time                       |
+| Interaction  | React Native animation and gesture primitives; independent selection and information targets        |
+| Verification | Jest screen/integration tests, ESLint, formatting checks, and a reproducible UI capture script      |
+| Delivery     | Manual GitHub Actions APK builds with signature and application metadata checks                     |
+
+See [Architecture](docs/ARCHITECTURE.md) for module boundaries and testing coverage.
+
+## Run locally
+
+Use Node **22.13+ within Node 22**, or **24.3+**, JDK 17, and Android SDK 36. See the [development guide](docs/DEVELOPMENT.md) for signing setup and complete prerequisites.
 
 ```sh
 npm ci
 npm start
-# Another terminal, with an emulator or device connected:
+# In another terminal, with a device or emulator connected:
 npm run android
 ```
-
-Use the same development signing key as your earlier BAILA build to update that installed copy. The existing Android configuration expects an ignored local `android/app/debug.keystore`. Generate a standard Android debug key for a fresh development checkout; never commit signing keys. A new key requires uninstalling the earlier development build first.
-
-For a standalone test APK with JavaScript and images included:
-
-```sh
-cd android
-./gradlew --no-daemon --max-workers=2 assembleRelease
-```
-
-Output: `android/app/build/outputs/apk/release/app-release.apk`. It uses development signing and is not a store release. The source uses the modern Android application template, including an exported launcher activity and safe-area handling for edge-to-edge display.
-
-On macOS with Xcode, install the iOS pods and run `npm run ios`. The iOS host has been updated to match React Native 0.86; its bundle identifier remains `com.tbaila.v2` and display name is BAILA. iOS builds require separate validation on macOS.
-
-## Checks
 
 ```sh
 npm test -- --runInBand --watch=false
 npm run lint
+npm run format:check
 ```
 
-The tests cover deck composition, immutable selection, artwork-only cards, complete deck progression, and EN/RU switching across real screen navigation, card details, and exit dialogs. Native animation, touch, and OS compatibility should also be checked on a device.
+The installed name is **BAILA**. Its application ID is `com.tbaila.v2`, allowing it to coexist with the original app. APKs are attached to [GitHub Releases](https://github.com/giarous/baila-v2/releases), not committed into the source tree. A new APK is produced only after running the manual build workflow. These are development-signed previews, not Google Play releases. iOS sources are included but require validation on macOS.
 
-## Cloud environment
+## Project ownership and AI assistance
 
-Activate the modern build tools with `source /workspace/.android-dev/activate-modern.sh`. The old `activate.sh` selects the retired Node 12/JDK 11 build stack and must not be used for this version.
+A personal project by [giarous](https://github.com/giarous). The Classic BAILA redesign, component restructuring, and portfolio documentation were implemented with **OpenAI Codex**, following the owner's direction. The related commits explicitly identify this AI assistance.
 
-Dependencies use the standard package-manager destinations plus `repo.reactnative.dev`, the download host to which Maven Central redirects the React Native 0.86 Android binary. The cloud proxy's CA store remains enabled for Java/Gradle downloads. If that destination is blocked, add it to environment network settings and save before rebuilding; do not disable verification.
+## Credits and rights
 
-The current source passes JavaScript tests and lint. Local native release verification is blocked by access to that binary host. The manual GitHub workflow builds outside this cloud workspace and reports its actual native build result. The outdated APK has been removed from the current repository tree to avoid confusing it with the updated build; older commits retain it. A new APK is available only after a successful workflow run.
-
-## Code structure
-
-| Location                   | Responsibility                                            |
-| -------------------------- | --------------------------------------------------------- |
-| `App.js`                   | Screen routing and Android back handling                  |
-| `src/screens/`             | Home, card selection, instructions, and gameplay          |
-| `src/components/`          | Shared controls, artwork, safe areas, and the swipe stack |
-| `src/state/GameContext.js` | Session selection, language, and active deck              |
-| `src/i18n.js`              | English and Russian interface strings                     |
-| `src/game/deck.js`         | Immutable deck construction, shuffling, and rule lookup   |
-| `constants/photoCards.js`  | Original bilingual card catalogue                         |
-
-Every game shuffles four copies of each enabled card type and starts directly on a card. The final swipe returns home. Empty selection disables starting a game. Selection and language remain shared while navigating during a session; they are not persisted across app restarts.
-
-## License
-
-This app was created as a personal challenge and is not affiliated with or endorsed by "Baila". All associated copyrights and trademarks belong to their respective owners. The physical version can be found on [Baila Games](https://www.facebook.com/BailaGames).
+This app was created as a personal challenge and is not affiliated with or endorsed by “Baila”. All associated copyrights and trademarks belong to their respective owners. The physical version can be found on [Baila Games](https://www.facebook.com/BailaGames). No additional license to third-party artwork or branding is implied by this repository.

@@ -1,0 +1,15 @@
+{
+  "name": "baila-ui-previews",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Development-only browser captures of the real BAILA screen components",
+  "scripts": {
+    "capture": "node capture.cjs"
+  },
+  "dependencies": {
+    "esbuild": "0.25.9",
+    "playwright-core": "1.56.1",
+    "react-dom": "19.2.3",
+    "react-native-web": "0.21.2"
+  }
+}
