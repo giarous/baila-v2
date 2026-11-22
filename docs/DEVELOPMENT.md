@@ -56,7 +56,7 @@ npm run screenshots
 
 The tool uses `/usr/bin/chromium` when present, otherwise installed Google Chrome. Set `CHROMIUM_EXECUTABLE` to use another executable. It does not download a browser automatically. Tool dependencies are separate from the mobile app's dependencies.
 
-The script renders actual production components at 360 × 640 CSS pixels (9:16 aspect ratio, 2× output), captures English home, deck selection, gameplay, and instructions, and writes `docs/screenshots/`. Game randomness is temporarily fixed by the browser fixture to capture a repeatable first card; production randomness is unchanged. It also checks home controls at 320 × 568 and 430 × 932 and the 3:4 selection layout.
+The script renders actual production components at 360 × 640 CSS pixels (9:16 aspect ratio, 2× output), captures English home, deck selection, gameplay, and instructions, and writes `docs/screenshots/`. Home and gameplay retain 9:16 framing; scrollable deck and instructions captures expand to their full content height to avoid clipped cards and rules. Game randomness is temporarily fixed by the browser fixture to capture a repeatable first card; production randomness is unchanged. It also checks home controls at 320 × 568 and 430 × 932 and the 3:4 selection layout.
 
 These are browser-rendered UI previews, not Android screenshots. Verify native dialogs, swipes, animations, and safe areas on a device before a release.
 

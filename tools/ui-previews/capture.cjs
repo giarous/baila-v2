@@ -98,7 +98,55 @@ async function capture() {
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
     const button = (name) => page.getByRole('button', {name, exact: true});
-    const shot = async (name) => {
+    const shot = async (name, fullContent = false) => {
+      // Documentation captures expand scroll containers rather than cutting a
+      // card or rule at the viewport boundary. Mobile app styles are unchanged.
+      if (fullContent) {
+        await page.setViewportSize({width: 360, height: 10000});
+        await page.evaluate(() => {
+          document.querySelectorAll('*').forEach((element) => {
+            const {overflowY} = getComputedStyle(element);
+            if (overflowY === 'auto' || overflowY === 'scroll') {
+              element.style.flex = 'none';
+              element.style.height = 'auto';
+              let ancestor = element.parentElement;
+              while (ancestor) {
+                ancestor.style.flex = 'none';
+                ancestor.style.height = 'auto';
+                ancestor = ancestor.parentElement;
+              }
+              element.style.overflow = 'visible';
+            }
+          });
+          for (const element of [
+            document.documentElement,
+            document.body,
+            document.getElementById('root'),
+          ]) {
+            element.style.height = 'auto';
+            element.style.overflow = 'visible';
+          }
+        });
+      }
+      if (fullContent) {
+        // FlatList renders additional rows asynchronously after its bounds expand.
+        await page.waitForFunction((screen) => {
+          const selector =
+            screen === 'deck' ? '[role="checkbox"]' : '[role="button"]';
+          return (
+            document.querySelectorAll(selector).length >=
+            (screen === 'deck' ? 28 : 29)
+          );
+        }, name);
+      }
+      if (name === 'deck') {
+        const lastCard = await page.getByRole('checkbox').last().boundingBox();
+        const done = await button('Done · 112 cards').boundingBox();
+        assert(
+          done.y >= lastCard.y + lastCard.height,
+          'Full-content capture must place Done below every card',
+        );
+      }
       await page.evaluate(() =>
         Promise.all(
           Array.from(document.images).map((image) =>
@@ -114,6 +162,9 @@ async function capture() {
       await page.screenshot({
         path: path.join(output, name + '.png'),
         animations: 'disabled',
+        ...(fullContent
+          ? {clip: await page.locator('#root').boundingBox()}
+          : {}),
       });
     };
     const checkHome = async () => {
@@ -138,7 +189,11 @@ async function capture() {
       Math.abs(tile.width / tile.height - 0.75) < 0.02,
       'Selection tiles must retain their 3:4 ratio',
     );
-    await shot('deck');
+    await shot('deck', true);
+    // Reload to restore normal viewport styling after the full-content capture.
+    await page.setViewportSize({width: 360, height: 640});
+    await page.goto(address);
+    await button('Make it your deck').click();
     await button('Done · 112 cards').click();
 
     // A deterministic draw makes the gallery stable without changing app data.
@@ -168,7 +223,7 @@ async function capture() {
         exact: false,
       })
       .waitFor();
-    await shot('instructions');
+    await shot('instructions', true);
 
     for (const viewport of [
       {width: 320, height: 568},

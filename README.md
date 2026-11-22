@@ -15,7 +15,7 @@ Choose your cards, shuffle the deck, and play together. BAILA brings 28 illustra
 
 The **Classic BAILA** palette takes its green and cyan accents from the game logo, with a pale green background and clean white cards.
 
-These images capture the **actual app components rendered in a browser for documentation**. They are not Android device screenshots; native fonts, dialogs, safe areas, and system chrome may differ. The capture script uses the production screens rather than a separate mockup.
+These images capture the **actual app components rendered in a browser for documentation**. They are not Android device screenshots; native fonts, dialogs, safe areas, and system chrome may differ. The capture script uses the production screens rather than a separate mockup. Home and gameplay use 9:16 framing; deck selection and instructions show their full scrollable content so cards and rules are not cut off.
 
 <table>
 <tr><th>Home</th><th>Your deck</th><th>Gameplay</th><th>How to play</th></tr>
