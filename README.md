@@ -15,15 +15,15 @@ Choose your cards, shuffle the deck, and play together. BAILA brings 28 illustra
 
 The **Classic BAILA** palette takes its green and cyan accents from the game logo, with a pale green background and clean white cards.
 
-These images capture the **actual app components rendered in a browser for documentation**. They are not Android device screenshots; native fonts, dialogs, safe areas, and system chrome may differ. The capture script uses the production screens rather than a separate mockup. Home and gameplay use 9:16 framing; deck selection and instructions show their full scrollable content so cards and rules are not cut off.
+Android screenshots show the home screen, deck selection, gameplay, and searchable card rules.
 
 <table>
 <tr><th>Home</th><th>Your deck</th><th>Gameplay</th><th>How to play</th></tr>
 <tr>
-<td><img src="docs/screenshots/home.png" width="210" alt="BAILA home with green play button and pale green secondary buttons"></td>
-<td><img src="docs/screenshots/deck.png" width="210" alt="Compact illustrated selection cards with individual information buttons"></td>
-<td><img src="docs/screenshots/game.png" width="210" alt="Artwork-focused gameplay with Details and Next card controls"></td>
-<td><img src="docs/screenshots/instructions.png" width="210" alt="Searchable rules with expandable card descriptions"></td>
+<td><img src="docs/screenshots/home-phone.webp" width="210" alt="BAILA home with green play button and pale green secondary buttons"></td>
+<td><img src="docs/screenshots/deck-phone.webp" width="210" alt="Compact illustrated selection cards with individual information buttons"></td>
+<td><img src="docs/screenshots/game-phone.webp" width="210" alt="Artwork-focused gameplay with Details and Next card controls"></td>
+<td><img src="docs/screenshots/instructions-phone.webp" width="210" alt="Searchable rules with expandable card descriptions"></td>
 </tr>
 </table>
 
