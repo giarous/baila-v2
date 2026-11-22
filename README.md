@@ -1,21 +1,15 @@
 # BAILA
 
-### A playful mobile card game, built with React Native
-
 ![React Native](https://img.shields.io/badge/React_Native-0.86-237D39?logo=react&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES_Modules-F7DF1E?logo=javascript&logoColor=black)
 ![Android](https://img.shields.io/badge/Android-API_24%2B-237D39?logo=android&logoColor=white)
-![Language](https://img.shields.io/badge/Language-English-007A9E)
+[![Code quality](https://github.com/giarous/baila-v2/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/giarous/baila-v2/actions/workflows/quality.yml)
 
-Choose your cards, shuffle the deck, and play together. BAILA brings 28 illustrated card types to a simple mobile interface with swipe navigation and rules available whenever you need them.
+BAILA is a React Native party card game for groups sharing one phone. Choose from 28 illustrated card types, swipe through your shuffled deck, and look up rules as you play. The app works offline and requires no account.
 
 [**Download Android preview**](https://github.com/giarous/baila-v2/releases) · [Build an APK](https://github.com/giarous/baila-v2/actions/workflows/android-apk.yml) · [Architecture](docs/ARCHITECTURE.md) · [Development guide](docs/DEVELOPMENT.md)
 
 ## A look inside
-
-The **Classic BAILA** palette takes its green and cyan accents from the game logo, with a pale green background and clean white cards.
-
-Android screenshots show the home screen, deck selection, gameplay, and searchable card rules.
 
 <table>
 <tr><th>Home</th><th>Your deck</th><th>Gameplay</th><th>How to play</th></tr>
@@ -27,28 +21,18 @@ Android screenshots show the home screen, deck selection, gameplay, and searchab
 </tr>
 </table>
 
-## What you can do
+## How it works
 
-- Build a custom deck from 28 card types, with four copies of every selected type.
-- Check any card's rules from its independent Info button without changing your selection.
-- Swipe through a shuffled deck or use Next card. Gameplay keeps the artwork visible and opens rules through Details.
-- Search English card names, expand instructions, and read rules through clear information controls.
+- **Build a deck.** Each selected card type adds four copies. Open a card’s Info button to read its rule without changing the selection.
+- **Play at your pace.** Swipe or tap Next card to advance. The card stays artwork-first, with its rule available through Details.
+- **Find a rule.** Search by card name and expand a rule without starting a game.
 
-Home and gameplay use fixed layouts. Deck selection uses compact 3:4 tiles. Deck selection survives navigation during a session and resets when the app restarts. No account or backend is required.
+## Engineering highlights
 
-## Engineering decisions
-
-| Concern      | Approach                                                                                            |
-| ------------ | --------------------------------------------------------------------------------------------------- |
-| Presentation | Dedicated screen components, reusable UI controls, and semantic design tokens                       |
-| State        | A session provider above a small four-screen router                                                 |
-| Game logic   | Pure deck construction and immutable Fisher–Yates shuffling, with injectable randomness for testing |
-| Content      | Shared English interface copy and a single-language card catalogue                                  |
-| Interaction  | React Native animation and gesture primitives; independent selection and information targets        |
-| Verification | Jest screen/integration tests, ESLint, formatting checks, and a reproducible UI capture script      |
-| Delivery     | Manual GitHub Actions APK builds with signature and application metadata checks                     |
-
-See [Architecture](docs/ARCHITECTURE.md) for module boundaries and testing coverage.
+- **Session state.** A React Context provider above the navigator keeps the deck selection in memory as players move between screens. [GameContext.js](src/state/GameContext.js)
+- **Testable shuffle.** Deck construction creates a fresh array, then applies Fisher–Yates with injectable randomness for deterministic tests. [deck.js](src/game/deck.js)
+- **Gesture handling.** The swipe stack advances the deck when a gesture commits and reads the latest callbacks during animations. [CardStack.js](src/components/CardStack.js)
+- **Verification and delivery.** CI runs Jest, ESLint, and Prettier. The separate APK workflow checks the package signature, application ID, display name, and Android target. [GitHub Actions](https://github.com/giarous/baila-v2/actions)
 
 ## Run locally
 
@@ -67,7 +51,7 @@ npm run lint
 npm run format:check
 ```
 
-The installed name is **BAILA**. Its application ID is `com.tbaila.v2`, allowing it to coexist with the original app. APKs are attached to [GitHub Releases](https://github.com/giarous/baila-v2/releases), not committed into the source tree. A new APK is produced only after running the manual build workflow. These are development-signed previews, not Google Play releases. iOS sources are included but require validation on macOS.
+The APK is a development-signed preview. See the [Android preview notes](docs/android-preview-notes.md) for installation and signing details. The iOS project requires validation on macOS.
 
 ## Project ownership
 
