@@ -3,7 +3,7 @@
 - Installed name: **BAILA**.
 - Application ID: `com.tbaila.v2`, separate from the original `com.tbaila` app.
 - Android 16/API 36 target; Android 7/API 24 or newer required.
-- Interface, instructions, selection, card details, and dialogs follow the EN/RU switch.
+- On `main`, the interface, instructions, selection, card details, and dialogs are English-only. The `multilingual` branch preserves the English/Russian version.
 - Fixed home/game layouts with artwork-only cards and a Details button.
 - Compact 3:4 deck-selection cards with fitted artwork and a separate Info button on every card.
 

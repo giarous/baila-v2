@@ -10,7 +10,6 @@ export function GameProvider({children}) {
   const [cards, setCards] = useState(() =>
     photoCards.map((card) => ({...card})),
   );
-  const [language, setLanguage] = useState('en');
   const [deck, setDeck] = useState([]);
 
   const toggleCard = (name) => {
@@ -34,8 +33,6 @@ export function GameProvider({children}) {
       value={{
         cards,
         deck,
-        language,
-        setLanguage,
         toggleCard,
         selectAll,
         startGame,

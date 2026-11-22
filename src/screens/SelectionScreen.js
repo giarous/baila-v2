@@ -1,5 +1,5 @@
 import React from 'react';
-import {useStrings} from '../i18n';
+import {strings} from '../content';
 import SelectionCard from '../components/SelectionCard';
 import {
   Alert,
@@ -11,16 +11,15 @@ import {
 } from 'react-native';
 import {Screen, Header, Button} from '../components/ui';
 import {useGame} from '../state/GameContext';
-import {localizeCard, COPIES_PER_CARD} from '../game/deck';
+import {COPIES_PER_CARD} from '../game/deck';
 import {colors, typography} from '../theme';
 
 export default function SelectionScreen({navigation}) {
-  const strings = useStrings();
-  const {cards, language, toggleCard, selectAll} = useGame();
+  const {cards, toggleCard, selectAll} = useGame();
   const selected = cards.filter((card) => card.state).length;
   const showInformation = (card) => {
-    const {title, description} = localizeCard(card, language);
-    Alert.alert(title, description, [{text: strings.close}]);
+    const {name, description} = card;
+    Alert.alert(name, description, [{text: strings.close}]);
   };
   return (
     <Screen>
@@ -45,19 +44,17 @@ export default function SelectionScreen({navigation}) {
       </View>
       <FlatList
         data={cards}
-        extraData={language}
         keyExtractor={(card) => card.name}
         numColumns={2}
         showsVerticalScrollIndicator={false}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
         renderItem={({item}) => {
-          const {title} = localizeCard(item, language);
           return (
             <SelectionCard
               card={item}
-              title={title}
-              informationLabel={strings.cardInformation(title)}
+              title={item.name}
+              informationLabel={strings.cardInformation(item.name)}
               onToggle={() => toggleCard(item.name)}
               onInformation={() => showInformation(item)}
             />

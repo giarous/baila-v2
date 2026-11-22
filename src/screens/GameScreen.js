@@ -1,16 +1,14 @@
 import React, {useRef, useState} from 'react';
-import {useStrings} from '../i18n';
+import {strings} from '../content';
 import {View, Text, Alert, StyleSheet} from 'react-native';
 import CardStack from '../components/CardStack';
 import {Screen, Header, Button} from '../components/ui';
 import PlayingCard from '../components/PlayingCard';
 import {useGame} from '../state/GameContext';
-import {localizeCard} from '../game/deck';
 import {colors} from '../theme';
 
 export default function GameScreen({navigation}) {
-  const strings = useStrings();
-  const {deck, language} = useGame();
+  const {deck} = useGame();
   const swiper = useRef(null);
   const [index, setIndex] = useState(0);
   const [layout, setLayout] = useState(null);
@@ -32,8 +30,8 @@ export default function GameScreen({navigation}) {
     if (!card) {
       return;
     }
-    const {title, description} = localizeCard(card, language);
-    Alert.alert(title, description, [{text: strings.close}]);
+    const {name, description} = card;
+    Alert.alert(name, description, [{text: strings.close}]);
   };
   const measure = (event) => {
     const size = event.nativeEvent.layout;

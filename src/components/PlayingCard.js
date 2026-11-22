@@ -1,16 +1,13 @@
 import React from 'react';
 import {View, Image, StyleSheet} from 'react-native';
-import {useGame} from '../state/GameContext';
-import {localizeCard} from '../game/deck';
 
 /** Keep the whole illustration visible; rules are opened separately with Details. */
 export default function PlayingCard({card}) {
-  const {language} = useGame();
   return (
     <View style={styles.card}>
       <Image
         source={card.photo}
-        accessibilityLabel={localizeCard(card, language).title}
+        accessibilityLabel={card.name}
         style={styles.image}
       />
     </View>

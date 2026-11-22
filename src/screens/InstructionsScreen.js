@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useStrings} from '../i18n';
+import {strings} from '../content';
 import CardArtwork from '../components/CardArtwork';
 import {
   FlatList,
@@ -11,20 +11,17 @@ import {
 } from 'react-native';
 import {Screen, Header} from '../components/ui';
 import {useGame} from '../state/GameContext';
-import {introduction, localizeCard} from '../game/deck';
+import {introduction} from '../game/deck';
 import {colors, typography} from '../theme';
 
 export default function InstructionsScreen({navigation}) {
-  const strings = useStrings();
-  const {cards, language} = useGame();
+  const {cards} = useGame();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState(null);
-  const guide = localizeCard(introduction, language);
-  // Search both languages so switching the rule language never hides a match.
+  // Normalize the query once per render; the catalogue stays unchanged.
+  const normalizedQuery = query.trim().toLowerCase();
   const matching = cards.filter((card) =>
-    `${card.name} ${card.name_ru}`
-      .toLowerCase()
-      .includes(query.trim().toLowerCase()),
+    card.name.toLowerCase().includes(normalizedQuery),
   );
 
   return (
@@ -32,7 +29,7 @@ export default function InstructionsScreen({navigation}) {
       <Header navigation={navigation} />
       <FlatList
         data={matching}
-        extraData={{language, expanded}}
+        extraData={expanded}
         keyExtractor={(card) => card.name}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -44,7 +41,7 @@ export default function InstructionsScreen({navigation}) {
             </Text>
             <View style={styles.guide}>
               <Text style={styles.guideTitle}>{strings.basics}</Text>
-              <Text style={styles.guideText}>{guide.description}</Text>
+              <Text style={styles.guideText}>{introduction.description}</Text>
             </View>
             <Text style={styles.sectionTitle}>{strings.cardRules}</Text>
             <Text style={typography.body}>{strings.tapCard}</Text>
@@ -62,24 +59,23 @@ export default function InstructionsScreen({navigation}) {
         ListEmptyComponent={<Text style={styles.empty}>{strings.noCards}</Text>}
         renderItem={({item}) => {
           const open = expanded === item.name;
-          const content = localizeCard(item, language);
           return (
             <View style={styles.rule}>
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityState={{expanded: open}}
-                accessibilityLabel={content.title}
+                accessibilityLabel={item.name}
                 onPress={() => setExpanded(open ? null : item.name)}
                 style={styles.ruleHeader}
               >
                 <CardArtwork source={item.photo} style={styles.image} />
                 <View style={styles.ruleCopy}>
-                  <Text style={styles.ruleTitle}>{content.title}</Text>
+                  <Text style={styles.ruleTitle}>{item.name}</Text>
                 </View>
                 <Text style={styles.expand}>{open ? '−' : '+'}</Text>
               </TouchableOpacity>
               {open && (
-                <Text style={styles.description}>{content.description}</Text>
+                <Text style={styles.description}>{item.description}</Text>
               )}
             </View>
           );

@@ -88,28 +88,18 @@ it('prevents an empty game and permits starting again after selection', async ()
   expect(game.deck).toHaveLength(4);
 });
 
-it('searches bilingual names, expands rules, and switches their language', async () => {
+it('searches English names case-insensitively and expands matching rules', async () => {
   await mount(InstructionsScreen);
   const search = app.root.findByType(TextInput);
-  await act(async () => search.props.onChangeText('Бармен'));
+  await act(async () => search.props.onChangeText('  bArMaN  '));
   await act(async () =>
     app.root
       .findByProps({accessibilityRole: 'button', accessibilityLabel: 'Barman'})
       .props.onPress(),
   );
   expect(textIncludes(game.cards[0].description)).toBe(true);
-  await act(async () =>
-    app.root.findByProps({accessibilityLabel: 'Russian'}).props.onPress(),
-  );
-  expect(textIncludes(game.cards[0].description_ru)).toBe(true);
-  expect(
-    app.root.findByProps({
-      accessibilityRole: 'button',
-      accessibilityLabel: 'Бармен',
-    }).props.accessibilityState.expanded,
-  ).toBe(true);
   await act(async () => search.props.onChangeText('nothing matches this'));
-  expect(textIncludes('Карты не найдены')).toBe(true);
+  expect(textIncludes('No cards found')).toBe(true);
 });
 
 it('selects and clears the whole catalogue', async () => {
@@ -165,7 +155,7 @@ it('keeps home fixed with three equally structured actions and no marketing copy
   expect(textIncludes('Less scrolling.')).toBe(false);
 });
 
-it('shows rules only when Details is pressed, in the selected language', async () => {
+it('shows English rules only when Details is pressed and follows the current card', async () => {
   const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   await mount(GameScreen);
   await act(async () => {
@@ -181,15 +171,6 @@ it('shows rules only when Details is pressed, in the selected language', async (
     game.deck[0].description,
     expect.any(Array),
   );
-  await act(async () => {
-    game.setLanguage('ru');
-  });
-  await act(async () => details());
-  expect(alert).toHaveBeenLastCalledWith(
-    game.deck[0].name_ru,
-    game.deck[0].description_ru,
-    [{text: 'Закрыть'}],
-  );
   const stage = app.root.findAll(
     (node) => typeof node.props.onLayout === 'function',
   )[0];
@@ -199,8 +180,8 @@ it('shows rules only when Details is pressed, in the selected language', async (
   await act(async () => app.root.findByType(Swiper).props.onSwiped(0));
   await act(async () => details());
   expect(alert).toHaveBeenLastCalledWith(
-    game.deck[1].name_ru,
-    game.deck[1].description_ru,
+    game.deck[1].name,
+    game.deck[1].description,
     expect.any(Array),
   );
 });
@@ -210,10 +191,9 @@ it('renders gameplay cards as artwork without inline text or scrolling', async (
     <PlayingCard
       card={{
         name: 'Test card',
-        name_ru: 'Карта',
+
         photo: 1,
         description: 'Hidden rules',
-        description_ru: 'Правила',
       }}
     />
   ));
@@ -222,7 +202,7 @@ it('renders gameplay cards as artwork without inline text or scrolling', async (
   expect(textIncludes('Hidden rules')).toBe(false);
 });
 
-it('opens selection-card information without changing selection, in either language', async () => {
+it('opens English selection-card information without changing selection', async () => {
   const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   await mount(SelectionScreen);
   const original = game.cards;
@@ -237,16 +217,15 @@ it('opens selection-card information without changing selection, in either langu
   expect(game.cards).toBe(original);
   await act(async () => {
     game.toggleCard('Barman');
-    game.setLanguage('ru');
   });
   const selectionBeforeInfo = game.cards;
   const info = app.root.findByProps({testID: 'card-info-Barman'});
-  expect(info.props.accessibilityLabel).toBe('Информация о карте «Бармен»');
+  expect(info.props.accessibilityLabel).toBe('Information about Barman');
   await act(async () => info.props.onPress());
   expect(alert).toHaveBeenLastCalledWith(
-    game.cards[0].name_ru,
-    game.cards[0].description_ru,
-    [{text: 'Закрыть'}],
+    game.cards[0].name,
+    game.cards[0].description,
+    [{text: 'Close'}],
   );
   expect(game.cards).toBe(selectionBeforeInfo);
   expect(game.cards[0].state).toBe(false);
@@ -258,7 +237,7 @@ it('opens selection-card information without changing selection, in either langu
   expect(visible.length).toBeGreaterThan(0);
   for (const checkbox of visible) {
     const card = game.cards.find(
-      (item) => item.name_ru === checkbox.props.accessibilityLabel,
+      (item) => item.name === checkbox.props.accessibilityLabel,
     );
     expect(
       app.root.findByProps({testID: `card-info-${card.name}`}),

@@ -9,6 +9,10 @@
 
 The project uses React Native 0.86, React 19, Hermes, and the checksum-pinned Gradle 9.3.1 wrapper. Compile/target SDK is 36 (Android 16).
 
+## Branches
+
+`main` is English-only. Check out `multilingual` for the preserved English/Russian version. Each branch contains its matching code, tests, documentation, and screenshots. To build that version in GitHub Actions, select `multilingual` in the manual workflow branch selector.
+
 ## Install and run
 
 ```sh
@@ -52,7 +56,7 @@ npm run screenshots
 
 The tool uses `/usr/bin/chromium` when present, otherwise installed Google Chrome. Set `CHROMIUM_EXECUTABLE` to use another executable. It does not download a browser automatically. Tool dependencies are separate from the mobile app's dependencies.
 
-The script renders actual production components at 360 × 640 CSS pixels (9:16 aspect ratio, 2× output), captures EN/RU home, deck selection, gameplay, and instructions, and writes `docs/screenshots/`. Game randomness is temporarily fixed by the browser fixture to capture a repeatable first card; production randomness is unchanged. It also checks home controls at 320 × 568 and 430 × 932 and the 3:4 selection layout.
+The script renders actual production components at 360 × 640 CSS pixels (9:16 aspect ratio, 2× output), captures English home, deck selection, gameplay, and instructions, and writes `docs/screenshots/`. Game randomness is temporarily fixed by the browser fixture to capture a repeatable first card; production randomness is unchanged. It also checks home controls at 320 × 568 and 430 × 932 and the 3:4 selection layout.
 
 These are browser-rendered UI previews, not Android screenshots. Verify native dialogs, swipes, animations, and safe areas on a device before a release.
 

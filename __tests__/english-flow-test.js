@@ -2,19 +2,10 @@ import React from 'react';
 import renderer, {act} from 'react-test-renderer';
 import {Alert, Text, TextInput} from 'react-native';
 import App from '../App';
-import {translations} from '../src/i18n';
+import {strings} from '../src/content';
 import {photoCards} from '../constants';
 
-it('has the same complete UI vocabulary in both languages', () => {
-  expect(Object.keys(translations.ru).sort()).toEqual(
-    Object.keys(translations.en).sort(),
-  );
-  Object.keys(translations.en).forEach((key) => {
-    expect(typeof translations.ru[key]).toBe(typeof translations.en[key]);
-  });
-});
-
-it('switches buttons, instructions, card details, and dialogs together across navigation', async () => {
+it('keeps the complete navigation flow, rules, and dialogs English-only', async () => {
   const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   let app;
   const tap = async (id) => {
@@ -29,84 +20,85 @@ it('switches buttons, instructions, card details, and dialogs together across na
       app = renderer.create(<App />);
     });
     expect(hasText('BAILA')).toBe(true);
-    await tap('language-ru');
+    expect(
+      app.root.findAll(
+        (node) =>
+          typeof node.props.testID === 'string' &&
+          node.props.testID.startsWith('language-'),
+      ),
+    ).toHaveLength(0);
     expect(app.root.findByProps({testID: 'start-game'}).props.title).toBe(
-      'Начать игру',
+      'Let’s play',
     );
     expect(app.root.findByProps({testID: 'choose-cards'}).props.title).toBe(
-      'Выбрать карты',
+      'Make it your deck',
     );
     expect(app.root.findByProps({testID: 'how-to-play'}).props.title).toBe(
-      'Как играть',
+      'How to play',
     );
     await tap('choose-cards');
-    expect(hasText('Ваша колода')).toBe(true);
-    expect(hasText(translations.ru.copiesHint)).toBe(true);
-    expect(hasText('Снять выбор')).toBe(true);
+    expect(hasText('Your deck')).toBe(true);
+    expect(hasText(strings.copiesHint)).toBe(true);
+    expect(hasText('Clear all')).toBe(true);
     expect(app.root.findByProps({testID: 'selection-done'}).props.title).toBe(
-      'Готово · Карт: 112',
+      'Done · 112 cards',
     );
     await tap('select-all');
-    expect(hasText(translations.ru.emptySelection)).toBe(true);
-    expect(hasText('Выбрать все')).toBe(true);
+    expect(hasText(strings.emptySelection)).toBe(true);
+    expect(hasText('Select all')).toBe(true);
     expect(app.root.findByProps({testID: 'selection-done'}).props.title).toBe(
-      'Готово · Карт: 0',
+      'Done · 0 cards',
     );
     await tap('select-all');
     await tap('selection-done');
     await tap('how-to-play');
-    expect(hasText('Как играть')).toBe(true);
-    expect(hasText('Основные правила')).toBe(true);
-    expect(hasText('Правила карт')).toBe(true);
+    expect(hasText('How to play')).toBe(true);
+    expect(hasText('The basics')).toBe(true);
+    expect(hasText('Card rules')).toBe(true);
     const search = app.root.findByType(TextInput);
-    expect(search.props.placeholder).toBe('Найти карту…');
-    expect(search.props.accessibilityLabel).toBe('Поиск карт');
+    expect(search.props.placeholder).toBe('Find a card…');
+    expect(search.props.accessibilityLabel).toBe('Search cards');
     await act(async () => {
       search.props.onChangeText('no matching card');
     });
-    expect(hasText(translations.ru.noCards)).toBe(true);
+    expect(hasText(strings.noCards)).toBe(true);
     await act(async () => {
-      search.props.onChangeText('Бармен');
+      search.props.onChangeText('Barman');
     });
 
     const barman = app.root.findByProps({
       accessibilityRole: 'button',
-      accessibilityLabel: 'Бармен',
+      accessibilityLabel: 'Barman',
     });
     await act(async () => {
       barman.props.onPress();
     });
-    expect(hasText(photoCards[0].description_ru)).toBe(true);
-    expect(hasText(photoCards[0].description)).toBe(false);
+    expect(hasText(photoCards[0].description)).toBe(true);
     await tap('back-home');
     await tap('start-game');
     expect(app.root.findByProps({testID: 'card-details'}).props.title).toBe(
-      'Подробнее',
+      'Details',
     );
     expect(app.root.findByProps({testID: 'next-card'}).props.title).toBe(
-      'Следующая →',
+      'Next card →',
     );
     await tap('card-details');
     const [title, body, buttons] =
       alert.mock.calls[alert.mock.calls.length - 1];
     expect(
       photoCards.some(
-        (card) => card.name_ru === title && card.description_ru === body,
+        (card) => card.name === title && card.description === body,
       ),
     ).toBe(true);
-    expect(buttons).toEqual([{text: 'Закрыть'}]);
+    expect(buttons).toEqual([{text: 'Close'}]);
     await tap('back-home');
-    expect(alert).toHaveBeenLastCalledWith('Выйти из игры?', '', [
-      {text: 'Продолжить', style: 'cancel'},
-      {text: 'Выйти', style: 'destructive', onPress: expect.any(Function)},
+    expect(alert).toHaveBeenLastCalledWith('Leave this game?', '', [
+      {text: 'Keep playing', style: 'cancel'},
+      {text: 'Leave game', style: 'destructive', onPress: expect.any(Function)},
     ]);
     await act(async () => {
       alert.mock.calls[alert.mock.calls.length - 1][2][1].onPress();
     });
-    expect(app.root.findByProps({testID: 'start-game'}).props.title).toBe(
-      'Начать игру',
-    );
-    await tap('language-en');
     expect(app.root.findByProps({testID: 'start-game'}).props.title).toBe(
       'Let’s play',
     );

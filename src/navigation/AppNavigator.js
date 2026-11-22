@@ -6,7 +6,7 @@ import InstructionsScreen from '../screens/InstructionsScreen';
 import GameScreen from '../screens/GameScreen';
 
 // Four routes need no native navigation dependency. The session provider stays
-// above this router so selection and language survive screen changes.
+// above this router so selection survives screen changes.
 const screens = {
   Home: HomeScreen,
   Settings: SelectionScreen,

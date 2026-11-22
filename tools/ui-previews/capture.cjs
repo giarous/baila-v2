@@ -130,10 +130,6 @@ async function capture() {
     await button('Let’s play').waitFor();
     await checkHome();
     await shot('home');
-    await button('Russian').click();
-    await button('Начать игру').waitFor();
-    await shot('home-ru');
-    await button('Английский').click();
     await button('Make it your deck').click();
     const barman = page.getByRole('checkbox', {name: 'Barman', exact: true});
     await barman.waitFor();
@@ -189,7 +185,7 @@ async function capture() {
       'Preview must not have unhandled JavaScript errors',
     );
     console.log(
-      'Captured five actual-component previews; checked home controls at three viewport sizes and the 3:4 selection layout.',
+      'Captured four English actual-component previews; checked home controls at three viewport sizes and the 3:4 selection layout.',
     );
   } finally {
     if (browser) await browser.close();

@@ -1,12 +1,11 @@
 import React from 'react';
-import {useStrings} from '../i18n';
+import {strings} from '../content';
 import {View, Text, Image, StyleSheet} from 'react-native';
-import {Screen, Button, LanguagePicker} from '../components/ui';
+import {Screen, Button} from '../components/ui';
 import {useGame} from '../state/GameContext';
 import {colors} from '../theme';
 
 export default function HomeScreen({navigation}) {
-  const strings = useStrings();
   const {cards, startGame} = useGame();
   const selected = cards.some((card) => card.state);
   const play = () => {
@@ -19,7 +18,6 @@ export default function HomeScreen({navigation}) {
     <Screen>
       <View style={styles.header}>
         <Text style={styles.logo}>BAILA</Text>
-        <LanguagePicker />
       </View>
       <View style={styles.artwork}>
         <Image

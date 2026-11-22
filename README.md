@@ -5,7 +5,7 @@
 ![React Native](https://img.shields.io/badge/React_Native-0.86-237D39?logo=react&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES_Modules-F7DF1E?logo=javascript&logoColor=black)
 ![Android](https://img.shields.io/badge/Android-API_24%2B-237D39?logo=android&logoColor=white)
-![Languages](https://img.shields.io/badge/Languages-English_%2F_Russian-007A9E)
+![Language](https://img.shields.io/badge/Language-English-007A9E)
 
 Choose your cards, shuffle the deck, and play together. BAILA brings 28 illustrated card types to a simple mobile interface with swipe navigation and rules available whenever you need them.
 
@@ -27,21 +27,19 @@ These images capture the **actual app components rendered in a browser for docum
 </tr>
 </table>
 
-<details>
-<summary>See the Russian interface</summary>
+## Branches
 
-<img src="docs/screenshots/home-ru.png" width="260" alt="BAILA home with Russian button labels">
-
-</details>
+- **`main`** — English-only interface, card rules, and documentation previews. No language switch or localization layer.
+- **[`multilingual`](https://github.com/giarous/baila-v2/tree/multilingual)** — the preserved English/Russian version with language switching.
 
 ## What you can do
 
 - Build a custom deck from 28 card types, with four copies of every selected type.
 - Check any card's rules from its independent Info button without changing your selection.
 - Swipe through a shuffled deck or use Next card. Gameplay keeps the artwork visible and opens rules through Details.
-- Search and expand card instructions, and switch between English and Russian throughout the interface, including dialogs and accessibility labels.
+- Search English card names, expand instructions, and read rules through clear information controls.
 
-Home and gameplay use fixed layouts. Deck selection uses compact 3:4 tiles. Language and deck selection survive navigation during a session; they reset when the app restarts. No account or backend is required.
+Home and gameplay use fixed layouts. Deck selection uses compact 3:4 tiles. Deck selection survives navigation during a session and resets when the app restarts. No account or backend is required.
 
 ## Engineering decisions
 
@@ -50,7 +48,7 @@ Home and gameplay use fixed layouts. Deck selection uses compact 3:4 tiles. Lang
 | Presentation | Dedicated screen components, reusable UI controls, and semantic design tokens                       |
 | State        | A session provider above a small four-screen router                                                 |
 | Game logic   | Pure deck construction and immutable Fisher–Yates shuffling, with injectable randomness for testing |
-| Localization | Shared interface translations and bilingual card data resolved at render time                       |
+| Content      | Shared English interface copy and a single-language card catalogue                                  |
 | Interaction  | React Native animation and gesture primitives; independent selection and information targets        |
 | Verification | Jest screen/integration tests, ESLint, formatting checks, and a reproducible UI capture script      |
 | Delivery     | Manual GitHub Actions APK builds with signature and application metadata checks                     |

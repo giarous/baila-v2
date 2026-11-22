@@ -1,5 +1,5 @@
 import {photoCards} from '../constants';
-import {createDeck, shuffle, localizeCard} from '../src/game/deck';
+import {createDeck, shuffle} from '../src/game/deck';
 
 it('starts directly with four copies of each enabled card', () => {
   const cards = photoCards.map((card, index) => ({...card, state: index < 2}));
@@ -34,15 +34,10 @@ it('shuffles without losing, duplicating, or mutating entries', () => {
   expect(result.slice().sort()).toEqual(source);
 });
 
-it('preserves the English and Russian rule text', () => {
+it('keeps every playable card supplied with English rules and artwork', () => {
   photoCards.forEach((card) => {
-    expect(localizeCard(card, 'en')).toEqual({
-      title: card.name,
-      description: card.description,
-    });
-    expect(localizeCard(card, 'ru')).toEqual({
-      title: card.name_ru,
-      description: card.description_ru,
-    });
+    expect(card.name.trim().length).toBeGreaterThan(0);
+    expect(card.description.trim().length).toBeGreaterThan(0);
+    expect(card.photo).toBeDefined();
   });
 });
